@@ -1,0 +1,59 @@
+.menu{
+    width: 1.8rem;
+    height: 100%;
+    /*position:fixed;*/
+    top: .72rem;
+    left: 0;
+    bottom: 0;
+    background: #31343A;
+    padding-top: .3rem;
+}
+.menu li{
+    height: .6rem;
+    line-height: .3rem;
+    padding: .18rem 0 .186rem .21rem;
+    cursor: pointer;
+    color: #ffffff;
+    font-size: .16rem;
+    font-family: PingFangSC-Regular;
+    box-sizing: border-box;
+}
+.menu img{
+    margin-right: .151rem;
+    width: .219rem;
+    height: .234rem;
+    vertical-align: middle;
+}
+.selected_menu{
+    background: #4D4F54;
+}
+
+.menu li:hover{
+    background: #4D4F54;
+}
+.new_req{
+    display: inline-block;
+    width: .24rem;
+    height: .24rem;
+    background: #FE4F4F;
+    border-radius: 50%;
+    z-index: 999;
+    font-size: .14rem;
+    text-align: center;
+    line-height: .24rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

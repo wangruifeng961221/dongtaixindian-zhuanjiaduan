@@ -1,0 +1,123 @@
+<div id="header" v-cloak>
+    <div class="continue">
+        <img src="../img/navbar_logo.png" class="navbar_logo">
+        <div class="navbar_right">
+            <img src="../img/icon_head.png" class="icon_head">
+            <span class="name">范主任</span>
+            <img src="../img/btn_pulldown.png" class="btn_pulldown" @click="pulldown">
+            <div class="pulldown_page" v-if="flag">
+                <el-button type="text" @click="dialog" ref="dailog">修改密码</el-button>
+                <span class="sign_out" @click="SignOut">退出</span>
+            </div>
+        </div>
+    </div>
+    <!-- 修改密码 -->
+    <div v-if="!flag">
+        <el-dialog title="修改密码"
+                   :visible.sync="dialogFormVisible"
+                   top="2rem"
+                   width="7.24rem"
+                   :show-close=false>
+            <img src="../img/cupop_btn_close2.png" @click="close" class="close_img">
+            <form id="modify">
+                <div class="now_psd_main">
+                    <label id="v_nowPsd" style="display: none">当前密码</label>
+                    <el-input v-model="nowPsd" placeholder="请输入当前密码" class="inp_psd" :type="nowPsdFlag?'password':'text'" validator="notNull" vname="v_nowPsd" minlength="5" maxlength="20"></el-input>
+                    <div  @click="isHidden">
+                        <img src="../img/input_btn_hide.png" class="inp_hide" v-if="nowPsdFlag">
+                        <img src="../img/input_btn_display.png" class="inp_dis" v-if="!nowPsdFlag">
+                    </div>
+                </div>
+                <div class="now_psd_main">
+                    <label id="v_nwePsd" style="display:none;">新密码</label>
+                    <el-input v-model="newPsd" placeholder="请输入新密码" class="inp_psd" :type="newPsdFlag?'password':'text'" validator="notNull" vname="v_nwePsd" minlength="5" maxlength="20"></el-input>
+                    <div @click="isHiddenNew">
+                        <img src="../img/input_btn_hide.png" class="inp_hide" v-if="newPsdFlag">
+                        <img src="../img/input_btn_display.png" class="inp_dis" v-if="!newPsdFlag">
+                    </div>
+                </div>
+                <div class="now_psd_main">
+                    <label id="v_twoPsd" style="display: none">确认新密码</label>
+                    <el-input v-model="twoNewPsd" placeholder="请确认新密码" class="inp_psd" :type="twoNewPsdFlag?'password':'text'" vname="v_twoPsd" validator="notNull" minlength="5" maxlength="20"></el-input>
+                    <div @click="isHiddenTwo">
+                        <img src="../img/input_btn_hide.png" class="inp_hide" v-if="twoNewPsdFlag">
+                        <img src="../img/input_btn_display.png" class="inp_dis" v-if="!twoNewPsdFlag">
+                    </div>
+                </div>
+                <div class="errorText error" style="text-align: center;margin-left: -1.2rem"></div>
+                <span class="subBtn" @click="btn">提交</span>
+            </form>
+        </el-dialog>
+
+    </div>
+</div>
+<script type="text/javascript">
+    new Vue({
+        el: '#header',
+        data() {
+            return {
+                flag:false,
+                dialogFormVisible: false,
+                nowPsd:'',
+                nowPsdFlag:true,
+                newPsd:'',
+                newPsdFlag:true,
+                twoNewPsd:'',
+                twoNewPsdFlag:true,
+            }
+        },
+        mounted(){
+        },
+        methods: {
+            pulldown(){
+                this.flag=!this.flag;
+            },
+            dialog(){
+                this.nowPsd='';this.newPsd='';this.twoNewPsd='';
+                this.nowPsdFlag=true;this.newPsdFlag=true;this.twoNewPsdFlag=true;
+                this.dialogFormVisible=true;
+                this.flag=!this.flag;
+            },
+            close(){
+                this.dialogFormVisible=false;
+            },
+            isHidden(){
+                this.nowPsdFlag=!this.nowPsdFlag;
+            },
+            isHiddenNew(){
+                this.newPsdFlag=!this.newPsdFlag;
+            },
+            isHiddenTwo(){
+                this.twoNewPsdFlag=!this.twoNewPsdFlag;
+            },
+            btn(){
+                if(validateForm(modify)){
+                    if(this.newPsd!==this.twoNewPsd){
+                        $('.error').html('密码输入不相同');
+                        return false;
+                    }
+                    let url=expert.url+'/api/Users/ChangePassword?accessKey='+$.cookie(expert.cookie_key)+'&originalPassword='+this.nowPsd+'&newPassword='+this.newPsd;
+                    let params={
+                        accessKey:$.cookie(expert.cookie_key),
+                        originalPassword:this.nowPsd,
+                        newPassword:this.newPsd,
+                    };
+                    $.post(url,params,res=>{
+                        if(res.Status==Success){
+                            this.$message('修改密码成功,请重新登录');
+                            setTimeout(function () {
+                                window.location.href=expert.homeUrl+'login.html';
+                            },3000)
+                        }else {
+                            this.$message(res.Error);
+                        }
+                    })
+                }
+            },
+            SignOut(){
+                $.destroy();
+                window.location.href=expert.homeUrl+'login.html';
+            }
+        },
+    })
+</script>

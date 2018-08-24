@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="x5-orientation" content="portrait">
+    <meta id="metaEle" name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
+    <title>全部会诊</title>
+    <script type="text/javascript" src="../common/jquery.min.js"></script>
+    <script type="text/javascript" src="../common/link.js"></script>
+    <script src="../common/element/index.js"></script>
+    <link rel="stylesheet" href="../css/all_consultation.css">
+    <link rel="stylesheet" href="../css/header.css">
+    <link rel="stylesheet" href="../css/menu.css">
+    <link rel="stylesheet" href="../css/table.css">
+</head>
+<body>
+<div class="continue_etcomm" id="app">
+    <!--  头部-->
+    <div class="header_etcomm">
+
+    </div>
+    <div class="main_etcomm">
+        <!--菜单 -->
+        <div class="menu_etcomm">
+
+        </div>
+        <!-- 全部会诊-->
+        <div class="all">
+            <div class="all_con">
+                <div class="search_header">
+                    <el-date-picker
+                            v-model="value_start"
+                            type="date"
+                            :editable="false"
+                            :picker-options="pickerOptions0"
+                            format="yyyy-MM-dd"
+                            value-format="yyyy-MM-dd"
+                            @change="changeStart"
+                            placeholder="请选择开始日期">
+                    </el-date-picker>
+                    <el-date-picker
+                            v-model="value_end"
+                            type="date"
+                            value-format="yyyy-MM-dd"
+                            :editable="false"
+                            :picker-options="pickerOptions1"
+                            format="yyyy-MM-dd"
+                            @change="changeEnd"
+                            placeholder="请选择结束日期">
+                    </el-date-picker>
+                    <el-input v-model="search" placeholder="请输入关键字" class="search"></el-input>
+                    <span class="search_btn">搜索</span>
+                </div>
+                <div class="frame">
+                    <table cellspacing="0">
+                        <thead>
+                        <tr>
+                            <th style="border-left: 0;">危机</th>
+                            <th>请求时间</th>
+                            <th>请求账户</th>
+                            <th>医生姓名</th>
+                            <th>订单状态</th>
+                            <th style="border-right: 0;">未读消息</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-for="(item,index) in 10" :key="index"
+                            :class="[(index+1)%2==0?'':'bg_color',(index+1)==10?'table_bottom':'']"
+                            @click="handleClick">
+                            <td style="border-left: 0">
+                                <img src="../img/icon_crisis.png">
+                            </td>
+                            <td>
+                                2018-05-23 09:00
+                            </td>
+                            <td>
+                                docter01
+                            </td>
+                            <td>
+                                方医生
+                            </td>
+                            <td>
+                                未处理
+                            </td>
+                            <td style="border-right:0">
+                                无
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- 分页 -->
+                <div class="paging">
+                    <el-pagination
+                            background
+                            :page-size.sync="pageSize"
+                            @current-change="change"
+                            layout="prev, pager, next"
+                            :total="1000">
+                    </el-pagination>
+                    <span>每页{{pageSize}}条，共{{pageSize}}条</span>
+                    <!--<span>暂无数据</span>-->
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- 接单成功 -->
+    <div class="success" v-if="successFlag">
+        <img src="../img/identification_icon_success.png">
+        <span>接单成功</span>
+    </div>
+    <!-- 处理中 -->
+    <div class="in_hand" v-if="inHand">
+        <div class="hand">
+            <div class="header_hand">
+                <img src="../img/logo03.png">
+                <div class="hang_r">
+                    <span class="xz_hand">下载报告</span>
+                    <span @click="chatFlag=true">会诊会话
+                        <i class="conversation"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="xd_img">
+                <div class="img_border">
+                    <img src="../img/image_bc.png">
+                </div>
+                <div class="data_xd">
+                    <span class="danger">危险</span>
+                    <ul class="lists">
+                        <li>检测时间：<span>2018-08-06 008:52:11</span></li>
+                        <li>请求用户：<span>张先虎&nbsp;&nbsp;&nbsp;&nbsp;13033406556</span></li>
+                        <li>患者信息：<span>YUSLL&nbsp;&nbsp;&nbsp;&nbsp;男/33</span></li>
+                        <li>主述&nbsp;/&nbsp;病史 ：<span class="history_illness"></span><span>心胸心胸心胸心胸心胸心胸</span></li>
+                    </ul>
+                    <!-- 诊断结果 -->
+                    <div>
+                        <div class="title_commonly">
+                            <span class="title">诊断结果:</span>
+                            <span class="commonly" @click="diagnostic">常用诊断</span>
+                        </div>
+                        <el-input
+                                type="textarea"
+                                :rows="2"
+                                resize="none"
+                                maxlength="65"
+                                placeholder="请输入诊断结果"
+                                @keyup.delete.native="deleteDiagnostic"
+                                v-model="textareaZD">
+                        </el-input>
+                    </div>
+                    <!-- 专家建议 -->
+                    <div class="proposal">
+                        <div class="title_commonly">
+                            <span class="title">专家建议:</span>
+                            <span class="commonly">常用建议</span>
+                        </div>
+                        <el-input
+                                type="textarea"
+                                :rows="2"
+                                resize="none"
+                                maxlength="65"
+                                placeholder="请输入建议"
+                                v-model="textareaJY">
+                        </el-input>
+                    </div>
+                    <!-- 紧急程度 -->
+                    <div class="urgent">
+                        <span class="title">紧急程度:</span>
+                        <div class="urgent_list">
+                            <div class="urgent_category" v-for="(item,index) in urgentData" @click="radioChange(index)"
+                                 :class="index==2?'max_r_n':''">
+                                <img src="../img/btn_checkbox_nor.png" v-if="!flagImg[index]">
+                                <img src="../img/btn_checkbox_se.png" v-if="flagImg[index]">
+                                <span>{{item}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="sub_urgent">提交</span>
+                    <div class="Tips">
+                        <img src="../img/Tips.png">
+                        <span>此结论提交将无法更改，请确认结论进行提交</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <img src="../img/close_hand.png" class="close_cupop_btn" @click="closeCupop">
+    </div>
+    <!-- 提交成功 -->
+    <div class="success" v-if="successFlag">
+        <img src="../img/identification_icon_success.png">
+        <span>提交成功</span>
+    </div>
+    <!-- 提交后 -->
+    <div class="in_hand" v-if="handed">
+        <div class="hand">
+            <div class="header_hand">
+                <img src="../img/logo03.png">
+                <div class="hang_r">
+                    <span class="xz_hand">下载报告</span>
+                    <span>会诊会话
+                        <i class="conversation"></i>
+                    </span>
+                </div>
+            </div>
+            <div class="xd_img">
+                <div class="img_border">
+                    <img src="../img/image_bc.png">
+                </div>
+                <div class="data_xd">
+                    <span class="danger">危险</span>
+                    <ul class="lists">
+                        <li>检测时间：<span>2018-08-06 008:52:11</span></li>
+                        <li>请求用户：<span>张先虎&nbsp;&nbsp;&nbsp;&nbsp;13033406556</span></li>
+                        <li>患者信息：<span>YUSLL&nbsp;&nbsp;&nbsp;&nbsp;男/33</span></li>
+                        <li class="title_top">主述&nbsp;/&nbsp;病史： <span
+                                class="history_illness"></span><span>心胸心胸心胸心胸心胸心胸</span></li>
+                        <li class="title_top">诊断结果：<span class="history_illness"></span><span>心胸心胸心心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸胸心胸心胸心胸</span>
+                        </li>
+                        <li class="title_top">专家建议：<span class="history_illness"></span><span>心胸心胸心胸心胸心胸心胸</span></li>
+                        <li class="title_top">紧急程度：<span class="history_illness"></span><span>心胸心胸心胸心胸心胸心胸</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <img src="../img/close_hand.png" class="close_cupop_btn" @click="closeed">
+    </div>
+    <!-- 诊断模板 -->
+    <div class="diagnostic" v-if="diagnosticFlag" :key="Math.random()">
+        <div class="diagnostic_content">
+            <div class="diagnostic_header">
+                <p>诊断模板</p>
+                <img src="../img/cupop_btn_close2.png" @click="diagnosticFlag=false">
+            </div>
+            <div class="diagnostic_body">
+                <div class="diagnostic_title">
+                    <span>常用诊断</span>
+                    <span>我的诊断</span>
+                    <div class="add_zd" @click="addDiagnosisFlag=true"><img src="../img/add_icon.png">添加诊断</div>
+                </div>
+                <div class="diagnostic_data">
+                    <div class="diagnostic_lsits" id="diagnostic">
+                        <ul id="check">
+                            <li v-for="(item,index) in templateData">
+                                <span class="select_title">
+                                    <input type="checkbox"
+                                           :id="item.id"
+                                           :value="item.data"
+                                           class="input_check"
+                                           name="input_check"
+                                           v-model="checkedNames"
+                                           @change="changeDate"
+                                           @click="changeEvent($event)"
+                                    >
+                                    <label :for="item.id"></label>
+                                </span>
+                                <div class="diagnostic_nr" :class="index==0?'diagnostic_lsits_border_t':''">{{item.data}}</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="template_yx">
+                        <div>
+                            <span>已选模板:</span>
+                            <div>
+                            <textarea type="text"
+                                      v-model="selectTemp"
+                                      class="inp_temp"
+                                      disabled>
+                            </textarea>
+                            </div>
+                        </div>
+                        <div class="btn_temp">
+                            <span class="btn_qx" @click="aa">取消</span>
+                            <span class="btn_qd" @click="tempQD">确定</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 添加诊断 -->
+    <div class="add_diagnosis" v-show="addDiagnosisFlag">
+        <div class="add_diag_body">
+            <div class="diagnostic_header">
+                <p>添加诊断模板</p>
+                <img src="../img/cupop_btn_close2.png" @click="addDiagnosisFlag=false">
+            </div>
+            <el-input v-model="addDiagnosis"
+                      placeholder="模板内容不能超过65个字符"
+                      maxlength="65"
+            ></el-input>
+            <div class="btn_temp add_btn">
+                <span class="btn_qx" @click="addDiagnosisFlag=false">取消</span>
+                <span class="btn_qd">确定</span>
+            </div>
+        </div>
+    </div>
+    <!-- 会话会诊 -->
+    <div class="chat" v-if="chatFlag">
+        <div class="chat_header">
+            <div class="name">
+                <img src="../img/icon_head.png">
+                <span>范主任</span>
+            </div>
+            <div class="chat_history">
+                <img src="../img/btn_history.png">
+                <span>历史记录</span>
+            </div>
+            <div>
+                <img src="../img/btn_customerservice.png">
+                <span>呼叫客服</span>
+            </div>
+            <img src="../img/close_hand.png" class="chat_close" @click="chatFlag=false">
+        </div>
+        <div class="chat_body" id="chat_body">
+            <span class="chat_time">2018-08-08 10:00</span>
+            <div v-for="(item,index) in 8">
+                <div class="chat_other" v-if="index%2==0">
+                    <div class="chat_other_header">
+                        <img src="../img/icon_head.png">
+                        <span>测试</span>
+                    </div>
+                    <div class="chat_other_content">
+                        撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是
+                    </div>
+                </div>
+                <div class="chat_own" v-else>
+                    <div class="chat_other_header chat_own_header">
+                        <img src="../img/icon_head.png">
+                        <span>范主任</span>
+                    </div>
+                    <div class="chat_other_content chat_own_content">
+                        dsjasdfhsadhshdfhasdhfjasflhsalfhsahfkjashfhsakhfadsj
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat_bottom" >
+            <el-input
+                    type="textarea"
+                    placeholder="说点什么呢"
+                    resize="none"
+                    id="chat_bottom"
+                    v-model="chatData">
+            </el-input>
+            <span class="send_out">发送</span>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    new Vue({
+        el: '#app',
+        data() {
+            return {
+                value_start: '',
+                value_end: '',
+                search: '',
+                pageSize: expert.pageSize,
+                pickerOptions0: {
+                    disabledDate: (time) => {
+                        if (this.value_end != "") {
+                            return time.getTime() > Date.now() || time.getTime() > this.value_end;
+                        } else {
+                            return time.getTime() > Date.now();
+                        }
+                    }
+                },
+                pickerOptions1: {
+                    disabledDate: (time) => {
+                        return time.getTime() < this.value_start || time.getTime() > Date.now();
+                    }
+                },
+                successFlag: false,
+                textareaZD: '',//诊断
+                textareaJY: '',//建议
+                urgentData: ['非常紧急', '酌情紧急', '一般紧急', '正常报告', '无效报告'],
+                flagImg: [false, false, false, false, false],  //紧急程度
+                inHand: false,  //处理中
+                handed: false,  //处理完
+                checkedNames: [],
+                selectTemp: '发送发送到发送到发送到发送到发送到发送到到',  //已选模板
+                diagnosticFlag: false,  //诊断模板
+                addDiagnosis: '',// 添加模板
+                addDiagnosisFlag: false, // 添加模板
+                chatData:'',// 聊天内容
+                chatFlag:false,
+                templateData: [{
+                    id: 'list_0',
+                    data: 'T播改变'
+                }, {
+                    id: '1',
+                    data: 'ST改变SSdfasdfasfasffasfasT改变SST改变SST改变SST改变SST改变SST改变SST改变S'
+                }, {
+                    id: '2',
+                    data: 'Q-T改dfasdfasd变'
+                }, {
+                    id: '3',
+                    data: 'Q改变'
+                }],// 常用诊断
+            }
+        },
+        mounted() {
+            this.initHeader();
+            this.initMenu();
+        },
+        methods: {
+            aa() {
+                $("input[name=input_check]").prop("checked", false);
+                setTimeout(() => {
+                    this.diagnosticFlag = false;
+                    console.log(this);
+                }, 1000);
+            },
+            initHeader() {
+                var templateSrc = '/ectommZhuanjia/page/header.html' + '?r=' + Math.random();
+                $('.header_etcomm').load(templateSrc); //load
+            },
+            initMenu() {
+                var templateMenu = '/ectommZhuanjia/page/menu.html' + '?r=' + Math.random();
+                $('.menu_etcomm').load(templateMenu, {'name': '11'}); //load
+            },
+            changeStart() {
+                console.log(this.value_start);
+            },
+            changeEnd() {
+                console.log(this.value_end);
+            },
+            change(val) {
+                console.log(val);
+            },
+            radioChange(index) {
+                for (let i = 0; i <= 5; i++) {
+                    this.$set(this.flagImg, i, false);
+                }
+                this.$set(this.flagImg, index, true);
+            },
+            closeCupop() {
+                this.textareaZD = '';
+                this.textareaJY = '';
+                for (let i = 0; i <= 5; i++) {
+                    this.$set(this.flagImg, i, false);
+                }
+                this.inHand = !this.inHand;
+            },
+            closeed() {
+                this.handed = !this.handed;
+            },
+            //  点击表格tr
+            handleClick() {
+                //  未处理
+                if ('1' == expert.Untreated) {
+                    this.successFlag = true;
+                    setTimeout(() => {
+                        this.successFlag = false;
+                        this.inHand = true;
+                    }, 1000);
+                    return false;
+                }
+                //处理中
+                if ('2' == expert.Untreat) {
+                    return false;
+                }
+                //已处理
+                if ('3' == expert.Already_processed) {
+                    return false;
+                }
+            },
+            changeEvent(event) {
+                let value=event.target.value;
+                console.log(this.selectTemp.length + value.length);
+                if (this.selectTemp.length+value.length>65) {
+                    let target = event.target.id;
+                    $("input[id="+target+"]").prop("checked", false);
+                    return false;
+                }
+            },
+            changeDate() {
+                let data='';
+                for(let i=0;i<this.checkedNames.length;i++){
+                    data=data+this.checkedNames[i]+';';
+                }
+                this.selectTemp=data;
+            },
+            //     诊断模板  flag
+            diagnostic() {
+                this.selectTemp = '';
+                this.diagnosticFlag = !this.diagnosticFlag;
+            },
+            //诊断模板确定
+            tempQD(){
+                this.textareaZD=this.selectTemp;
+                this.diagnosticFlag=false;
+            },
+            //  删除诊断
+            deleteDiagnostic(){
+                console.log(this.textareaZD);
+            },
+        }
+    })
+</script>
+</body>
+</html>

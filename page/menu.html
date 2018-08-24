@@ -1,0 +1,50 @@
+<ul class="menu" id="memu">
+    <li :class="allFlag?'selected_menu':''" @click="toAll">
+        <img src="../img/navbar_icon_all_nor.png" v-if="!allFlag">
+        <img src="../img/navbar_icon_all_se.png" v-if="allFlag">
+        <span>全部会诊</span>
+    </li>
+    <li :class="newFlag?'selected_menu':''" @click="toNew">
+        <img src="../img/navbar_icon_request_nor.png" v-if="!newFlag">
+        <img src="../img/navbar_icon_request_se.png" v-if="newFlag">
+        <span>新请求
+            <i class="new_req">99</i>
+        </span>
+    </li>
+    <li :class="completFlag?'selected_menu':''" @click="toComplet">
+        <img src="../img/navbar_icon_complet_nor.png" v-if="!completFlag">
+        <img src="../img/nacbar_icon_complet_se.png" v-if="completFlag">
+        <span>已会诊</span>
+    </li>
+</ul>
+<script type="text/javascript">
+    new Vue({
+        el: '#memu',
+        data(){
+            return{
+                allFlag:false,
+                newFlag:false,
+                completFlag:false,
+            }
+        },
+        mounted(){
+        },
+        methods:{
+            toAll(){
+                this.newFlag=false;
+                this.completFlag=false;
+                this.allFlag=true;
+            },
+            toNew(){
+                this.completFlag=false;
+                this.allFlag=false;
+                this.newFlag=true;
+            },
+            toComplet(){
+                this.allFlag=false;
+                this.newFlag=false;
+                this.completFlag=true;
+            }
+        }
+    })
+</script>

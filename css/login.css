@@ -1,0 +1,183 @@
+body{
+    width: 100%;
+    height: 100%;
+    min-width: 720px;
+    background: url("../img/image_bc.png") no-repeat;
+}
+.container{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 1.8rem;
+}
+.logo{
+    width: 2.4rem;
+    height: .446rem;
+    margin-bottom: .6rem;
+}
+.img_left{
+    width: 4.2rem;
+    height: 5.4rem;
+}
+.content{
+    display: flex;
+    flex-direction: row;
+}
+.login_zj{
+    width: 5.8rem;
+    height: 5.4rem;
+    background: #ffffff;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    /*padding-left: 0.48rem;*/
+    padding: 0.8rem 0 0 0.48rem;
+    box-sizing: border-box;
+}
+.title{
+    font-size: 0.24rem;
+    color: #333333;
+    margin-bottom: 0.6rem;
+}
+.line{
+    display: inline-block;
+    width: 0.005rem;
+    border: 1px solid #EDEDEF;
+    height: .22rem;
+    background: #EDEDEF;
+    margin-left: 0.18rem;
+    position: relative;
+    top: -0.04rem;
+}
+.account{
+    position: relative;
+}
+.account_icon{
+    position: absolute;
+    top: 0.15rem;
+    left: 0.15rem;
+    z-index: 9!important;
+}
+.account_pic{
+    width: .2rem;
+    height: .2rem;
+}
+input::-webkit-input-placeholder {
+    color: #999999;
+    font-size: 0.14rem;
+    font-family: PingFangSC-Regular;
+   }
+.el-input__inner{
+    padding-left: 0.85rem;
+    font-size: 0.14rem;
+}
+.password{
+    margin-top: 0.2rem;
+}
+.btn{
+    display: block;
+    width: 3.6rem;
+    height: .48rem;
+    border-radius: 4px;
+    background: #64c2c1;
+    color: #ffffff;
+    font-size: .16rem;
+    text-align: center;
+    line-height: .48rem;
+    font-family: PingFangSC-Medium;
+    margin-top: .4rem;
+    cursor: pointer;
+}
+.member{
+    margin-top: 0.2rem;
+    width: 3.6rem;
+}
+.member img{
+    width: 0.2rem;
+    height: 0.2rem;
+    cursor: pointer;
+    vertical-align: top;
+}
+
+.member .title{
+    font-size: 0.14rem;
+    color: #999999;
+    margin-left: 0.1rem;
+    cursor: pointer;
+}
+.member .retrieve{
+    font-size: 0.14rem;
+    color: #64c2c1;
+    float: right;
+    cursor: pointer;
+}
+.zh_retrieve{
+    box-sizing: border-box;
+    width: 10rem;
+    height: 5.4rem;
+    background: #ffffff;
+    padding: .3rem .3rem 0 0;
+    text-align: center;
+}
+.code_h{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: .2rem;
+}
+.close{
+    float: right;
+    cursor: pointer;
+}
+.title_password{
+    font-size: .24rem;
+    color: #333333;
+    padding: .24rem 0 .36rem 0;
+    text-align: center;
+}
+.zh_retrieve .el-input__inner{
+    padding-left: 15px!important;
+}
+.zh_retrieve .code .el-input__inner{
+    width: 2.4rem;
+}
+.get_code{
+    display: inline-block;
+    margin-left: 0.1rem;
+    width: 1.1rem;
+    height: .48rem;
+    line-height: .48rem;
+    background: #64c2c1;
+    text-align: center;
+    color: #ffffff;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.second{
+    background: #cccccc;
+}
+.code_h .el-input{
+    width: unset;
+}
+.bottom_i{
+    margin-bottom: .2rem;
+}
+.psd_qd{
+    display: inline-block;
+    width: 3.6rem;
+    height: .48rem;
+    background: #64c2c1;
+    text-align: center;
+    line-height: .48rem;
+    color: #ffffff;
+    margin-top: .2rem;
+    font-size: .16rem;
+    border-radius: 4px;
+}
+.wrongTips{
+    margin-left: -2.8rem;
+}
+
+
+

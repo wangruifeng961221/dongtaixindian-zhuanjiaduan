@@ -1,0 +1,130 @@
+.continue{
+    width: 100%;
+    height: 72px;
+    background: #64c2c1;
+    padding: .21rem .32rem 0 .3rem;
+    display: flex;
+    justify-content:space-between;
+    box-sizing: border-box;
+}
+.navbar_logo{
+    width: 1.4rem;
+    height: .26rem;
+}
+.icon_head{
+    width: .22rem;
+    height: .242rem;
+}
+.name{
+    font-family: PingFangSC-Regular;
+    color: #ffffff;
+    font-size: .16rem;
+    margin-left: .16rem;
+}
+.btn_pulldown{
+    width: .16rem;
+    height: .16rem;
+    margin-left: 0.05rem;
+    vertical-align: unset;
+    cursor: pointer;
+}
+.pulldown_page{
+    /*width: .88rem;*/
+    width: 88px;
+    /*height: .85rem;*/
+    height: 85px;
+    background: #ffffff;
+    box-shadow: 0 2px 8px 0;
+    border-radius: 4px;
+    padding: .1rem 0 0 .16rem;
+    box-sizing: border-box;
+    position: absolute;
+    top: .5rem;
+    right: 0;
+}
+.pulldown_page span{
+    font-size: .14rem;
+    color: #666666;
+    cursor: pointer;
+}
+.sign_out{
+    display: block;
+    /*margin-top: .1rem;*/
+}
+.pulldown_page :after{
+    content: '';
+    display:block;
+    width:0;
+    height:0;
+    border-width:0.06rem;
+    border-style:solid;
+    border-color:transparent transparent #fff transparent;
+    position:absolute;
+    top:-.116rem;
+    right:0.08rem;
+}
+.navbar_right{
+    position: relative;
+}
+.el-dialog{
+    padding: .26rem .4rem .4rem;
+}
+.el-dialog__header{
+    padding: 0;
+    display: inline-block;
+}
+.el-dialog__title{
+    font-size: 20px;
+    color: #666666;
+    font-family: PingFangSC-Medium;
+}
+.el-dialog__body{
+    padding: 0;
+    text-align: right;
+}
+.close_img{
+    width: .28rem;
+    height: .28rem;
+    cursor: pointer;
+    position: relative;
+    top: -0.3rem;
+}
+.el-input{
+    text-align: center;
+}
+.inp_psd{
+    margin-top: .22rem;
+}
+.now_psd_main{
+    position: relative;
+    margin-bottom: .1rem;
+}
+.inp_hide{
+    position: absolute;
+    top: 0.35rem;
+    right: 1.7rem;
+}
+.inp_dis{
+    position: absolute;
+    top: 0.35rem;
+    right: 1.7rem;
+}
+.subBtn{
+    display: block;
+    border-radius: 4px;
+    width: 3.6rem;
+    height: .48rem;
+    background: #64c2c1;
+    text-align: center;
+    color: #ffffff;
+    font-size: .16rem;
+    line-height: .48rem;
+    margin: .3rem 0 1.16rem 1.42rem;
+    cursor: pointer;
+}
+.now_psd_main img{
+    cursor: pointer;
+}
+.error{
+    margin-left: -2.55rem!important;
+}

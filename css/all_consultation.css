@@ -1,0 +1,653 @@
+.success {
+    width: 3.2rem;
+    height: .87rem;
+    background: rgba(0, 0, 0, 0.8);
+    position: fixed;
+    top: 45%;
+    left: 45%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99;
+    border-radius: 4px;
+    color: #FFFFFF;
+    font-size: .18rem;
+}
+
+.success img {
+    width: 36px;
+    height: 36px;
+    margin-right: 15px;
+}
+
+/* 处理中 */
+.in_hand {
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, .5);
+    position: fixed;
+    top: 0;
+    left: 0;
+    overflow: auto;
+    overflow-x: hidden;
+}
+
+.hand {
+    position: relative;
+    top: 40px;
+    left: 1.7rem;
+}
+
+.header_hand {
+    width: 15.8rem;
+    height: 72px;
+    background: #ffffff;
+    padding: .19rem .3rem .21rem .21rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+}
+
+.hang_r {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.xz_hand {
+    margin-right: .2rem;
+}
+
+.header_hand img {
+    width: 1.38rem;
+    height: .32rem;
+}
+
+.header_hand span {
+    display: inline-block;
+    font-size: .16rem;
+    width: 1.08rem;
+    height: .4rem;
+    border-radius: 4px;
+    background: #64c2c1;
+    color: #ffffff;
+    font-family: PingFangSC-Medium;
+    text-align: center;
+    line-height: .4rem;
+    cursor: pointer;
+}
+
+.conversation {
+    display: inline-block;
+    background: #FE4F4F;
+    width: .1rem;
+    height: .1rem;
+    border-radius: 50%;
+}
+
+.xd_img {
+    /*padding-bottom: .43rem;*/
+    background: #FFFFFF;
+    width: 15.8rem;
+    display: flex;
+    flex-direction: row;
+}
+
+.img_border {
+    padding: .2rem .2rem .63rem .2rem;
+    border: 1px solid #DFDFDF;
+    border-bottom: 0;
+    width: 1217px;
+    height: 850px;
+    overflow: auto;
+    overflow-x: auto;
+}
+
+.data_xd {
+    background: #F9F9F9;
+    width: 320px;
+    min-width: 320px;
+    border-top: 1px solid #DFDFDF;
+    padding: 35px 20px 0 20px;
+    box-sizing: border-box;
+}
+
+.danger {
+    display: inline-block;
+    height: 28px;
+    width: 56px;
+    background: #FE4F4F;
+    border-radius: 14px 0 14px 0;
+    font-size: 14px;
+    color: #FFFFFF;
+    text-align: center;
+    line-height: 28px;
+    margin-bottom: 12px;
+}
+
+.lists {
+    margin-bottom: 30px;
+}
+
+.lists li {
+    font-size: 14px;
+    font-family: PingFangSC-Medium;
+    color: #333333;
+    font-weight: 550;
+    margin-bottom: 12px;
+}
+
+.lists li span {
+    font-weight: 500;
+}
+
+.history_illness {
+    display: block;
+    height: 12px;
+}
+
+.title_commonly {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 14px;
+    color: #333333;
+    font-weight: 550;
+}
+
+.commonly {
+    display: inline-block;
+    font-size: 14px;
+    color: #64C2C1;
+    width: 88px;
+    font-weight: 550;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    border: 1px solid #64C2C1;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.el-textarea__inner {
+    height: 130px;
+    margin-top: 12px;
+}
+
+.proposal {
+    margin-top: 30px;
+}
+
+.urgent {
+    margin-top: 30px;
+}
+
+.urgent_category {
+    font-size: 14px;
+    color: #666666;
+    margin-right: 24px;
+    margin-bottom: 12px;
+}
+
+.urgent_category img {
+    width: 16px;
+    height: 16px;
+    vertical-align: text-bottom;
+    cursor: pointer;
+}
+
+.max_r_n {
+    margin-right: 0;
+}
+
+.urgent_list {
+    display: flex;
+    margin-top: 12px;
+    flex-wrap: wrap;
+}
+
+.sub_urgent {
+    display: inline-block;
+    width: 100%;
+    height: 40px;
+    background: #64C2C1;
+    border-radius: 4px;
+    text-align: center;
+    line-height: 40px;
+    margin-top: 20px;
+    color: #FFFFFF;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.Tips {
+    margin-top: 13px;
+    margin-bottom: 107px;
+}
+
+.Tips img {
+    width: 16px;
+    height: 16px;
+}
+
+.Tips span {
+    color: #FE4F4F;
+}
+
+.title_top {
+    padding-top: 8px;
+}
+
+.close_cupop_btn {
+    position: absolute;
+    top: 50.1px;
+    right: 100px;
+    cursor: pointer;
+}
+
+/* 诊断模板 */
+.diagnostic {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.5);
+    width: 100%;
+    height: 100%;
+}
+
+.diagnostic_content {
+    padding: .26rem .4rem .43rem .4rem;
+    position: absolute;
+    width: 7.24rem;
+    height: 4.8rem;
+    top: 50%;
+    left: 50%;
+    margin-top: -2.8rem;
+    margin-left: -3.62rem;
+    background: #ffffff;
+}
+
+.diagnostic_header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: .46rem;
+}
+
+.diagnostic_header p {
+    font-family: PingFangSC-Medium;
+    font-size: .2rem;
+    color: #666666;
+}
+
+.diagnostic_header img {
+    width: .24rem;
+    height: .24rem;
+    cursor: pointer;
+}
+
+.diagnostic_title {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.diagnostic_title span {
+    display: inline-block;
+    height: .36rem;
+    width: 1rem;
+    color: #64c2c1;
+    font-size: .14rem;
+    line-height: .36rem;
+    text-align: center;
+    z-index: 9999;
+    border: 1px solid #64c2c1;
+    cursor: pointer;
+}
+
+.diagnostic_title_bg {
+    background: #64c2c1;
+    color: #FFFFFF;
+}
+
+.add_zd img {
+    width: .24rem;
+    height: .24rem;
+}
+
+.add_zd {
+    font-size: .14rem;
+    color: #666666;
+    margin-left: 1.26rem;
+    cursor: pointer;
+}
+
+.diagnostic_data {
+    display: flex;
+    flex-direction: row;
+}
+
+.diagnostic_lsits {
+    height: 3.08rem;
+    width: 4rem;
+    overflow-y: auto;
+}
+
+.diagnostic_lsits li {
+    display: flex;
+    flex-direction: row;
+}
+.diagnostic_lsits_border_t{
+    border-top: 1px solid #DFDFDF!important;
+}
+
+/* input 多选按钮 */
+
+#check .input_check {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    visibility: hidden;
+}
+
+#check span {
+    position: relative;
+}
+
+#check .input_check + label {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: url('../img/selected.png') no-repeat;
+    background-position: -31px -31px;
+    border: 1px solid #E0E0E5;
+}
+
+#check .input_check:checked + label {
+    background-position: 0 0;
+}
+
+.select_title{
+    /*display: inline-block;*/
+    /*padding: 18px 18px;*/
+    border-right: 0;
+    padding-top: 23px;
+    padding-left:18px;
+    padding-right: 18px;
+    border: 1px solid #DFDFDF;
+    border-top: 0;
+}
+.diagnostic_nr{
+    display: flex;
+    align-items: center;
+    width:3.092rem;
+    height: 57px;
+    border: 1px solid #DFDFDF;
+    font-size: 15px;
+    color: #666666;
+    text-align: left;
+    padding: 0 5px;
+    /*line-height: 44px;*/
+    border-top: 0;
+}
+
+/* 滚动条 */
+#diagnostic::-webkit-scrollbar-thumb {
+    border-radius: 13px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+    background-color: #c1c1c1;
+}
+#diagnostic::-webkit-scrollbar{
+    background: #f9f9f9;
+    width: 10px;
+    border: 1px solid #DFDFDF;
+    /*border-left:0 ;*/
+}
+#diagnostic::-webkit-scrollbar-button{
+    display: none;
+}
+
+
+
+
+.template_yx{
+    width: 2.2rem;
+    height: 2.44rem;
+    background: #F9F9F9;
+    border-radius: 4px;
+    margin-left: .1rem;
+    padding: 16px 0 0 16px;
+}
+.template_yx span{
+    font-size: 14px;
+    color: #999999;
+    font-family: PingFangSC-Regular;
+}
+.inp_temp{
+    width: 2rem;
+    height: 2rem;
+    background:#F9F9F9 ;
+    border: none;
+    resize:none;
+    font-size: .14rem;
+    color: #333333;
+    margin-top: .1rem;
+}
+
+.btn_temp{
+    margin-top: .2rem;
+    font-size: .16rem;
+}
+.btn_temp span{
+    height: .4rem;
+    line-height: .4rem;
+    color: #ffffff;
+    text-align: center;
+    border-radius: 4px;
+    display: inline-block;
+    cursor: pointer;
+}
+.btn_qx{
+    position: relative;
+    left: -.1rem;
+    width: .8rem;
+    background: #DFDFDF;
+}
+.btn_qd{
+    width: 1.3rem;
+    background: #64c2c1;
+}
+
+/* 添加诊断 */
+.add_diagnosis{
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 99999;
+}
+.add_diag_body{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -1.32rem;
+    margin-left: -3.62rem;
+    width: 7.24rem;
+    height: 2.64rem;
+    background: #FFFFFF;
+    border-radius: 4px;
+    padding: .26rem .4rem .43rem .4rem;
+    box-sizing: border-box;
+}
+.add_btn{
+    text-align: right;
+}
+
+/* 会话会诊 */
+.chat{
+    position: fixed;
+    top: 43px;
+    left: 170px;
+    width: 480px;
+    height: 640px;
+    background: #ffffff;
+    box-shadow: 0 2px 12px 0;
+    border-radius: 4px;
+}
+.chat_header{
+    height: 72px;
+    background: #64C2C1;
+    display: flex;
+    align-items: center;
+    color: #FFFFFF;
+    padding: 21px 20px 21px 24px;
+    box-sizing: border-box;
+}
+.chat_header .name{
+    font-size: 16px;
+}
+.chat_header span{
+    position: relative;
+    top: 3px;
+}
+.chat_header div{
+    cursor: pointer;
+}
+.chat_history{
+    margin: 0 20px 0 132px;
+}
+.chat_close{
+    width: 16px;
+    height: 16px;
+    margin-left: 16px;
+    cursor: pointer;
+}
+.chat_body{
+    height: 478px;
+    border-bottom: 1px solid #CCCCCC;
+    padding: 24px 20px 0 20px;
+    overflow-y: auto;
+}
+.chat_time{
+    font-family: PingFangSC-Regular;
+    font-size: 14px;
+    color: #999999;
+    /*margin: 0 165px 23px 154px;*/
+    margin-left: -20px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.chat_other{
+    margin: 20px 0;
+}
+.chat_other_header{
+    display: flex;
+    align-items: center;
+}
+.chat_other_header span{
+    margin-left: 10px;
+    font-size: 14px;
+    color: #999999;
+}
+.chat_other_content{
+    position: relative;
+    background:#ECf0F1 ;
+    padding: 12px 14px;
+    max-width: 298px;
+    border-radius: 4px;
+    margin-left: 35px;
+    color: #333333;
+    font-size: 14px;
+    word-break:break-all;
+}
+.chat_other_content:after{
+    position: absolute;
+    content:url("../img/dialogbox.png");
+    top: -1px;
+    left: -4px;
+}
+.chat_own{
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    padding: 20px 0;
+}
+.chat_own_content:after{
+    position: absolute;
+    content:url("../img/dialogbox_right.png");
+    top: -1px;
+    left: unset;
+    right: -4px!important;
+}
+.chat_own_header{
+    flex-direction:row-reverse;
+}
+.chat_own_header img{
+    margin-left: 10px;
+}
+.chat_own_content{
+    margin-left: 76px!important;
+}
+
+#chat_body::-webkit-scrollbar{
+    background: #FFFFFF;
+    width: 6px;
+}
+#chat_body::-webkit-scrollbar-button{
+    display: none;
+}
+#chat_body::-webkit-scrollbar-thumb{
+    background: #D8D8D8;
+    border-radius: 4px;
+}
+.chat_bottom .el-textarea__inner{
+    border: 0;
+    margin-top: 0;
+    height: auto;
+    width: 338px;
+    overflow-y: auto;
+}
+.chat_bottom .el-textarea{
+    width: inherit;
+}
+#chat_bottom::-webkit-scrollbar{
+    background: #FFFFFF;
+    width: 6px;
+}
+#chat_bottom::-webkit-scrollbar-button{
+    display: none;
+}
+#chat_bottom::-webkit-scrollbar-thumb{
+    background: #D8D8D8;
+    border-radius: 4px;
+}
+.send_out{
+    display: inline-block;
+    width: 72px;
+    height: 32px;
+    text-align: center;
+    line-height: 32px;
+    border-radius: 4px;
+    border: 1px solid #64C2c1;
+    margin: 10px 0 20px 0;
+    cursor: pointer;
+    position: relative;
+    right: -40px;
+    font-size: 14px;
+    color: #64C2C1;
+}
+
+
+
+
+
+

@@ -1,0 +1,130 @@
+.main_etcomm{
+    display: flex;
+    flex-direction: row;
+}
+.menu_etcomm{
+    width: 1.8rem;
+}
+.all{
+    padding: .28rem .3rem .4rem .3rem;
+}
+.all_con{
+    width: 16.6rem;
+    min-height: 800px;
+    border: 1px solid #DFDFDF;
+    height: 800px;
+    background: #FFFFFF;
+}
+
+.el-input--suffix .el-input__inner{
+    padding-right: 0;
+}
+.search_header .el-input__inner{
+    height: .4rem;
+    line-height: .4rem;
+    border: 1px solid #DFDFDF;
+    width: -webkit-fill-available;
+}
+.search{
+    width: 2.8rem!important;
+}
+.search_btn{
+    display: inline-block;
+    width: .6rem;
+    height: .4rem;
+    line-height: .4rem;
+    cursor: pointer;
+    color: #FFFFFF;
+    background: #64C2C1;
+    text-align: center;
+    border-radius: 0 4px 4px 0;
+    position: relative;
+    left: -5px;
+    font-size: .14rem;
+}
+.search_header{
+    padding: .32rem .1rem 0 .1rem;
+}
+.el-date-editor.el-input{
+    margin-right: .2rem;
+}
+.search input{
+    margin-left: .1rem;
+}
+
+.frame{
+    width: 98%;
+    height: 560px;
+    border: 1px solid #DFDFDF;
+    margin: .3rem 1% .3rem 1%;
+    border-top:0 ;
+}
+table{
+    width: 100%;
+    text-align: center;
+    /*height: 1611px;*/
+}
+
+table th{
+    border-bottom: 0;
+    font-size: .16rem;
+    font-weight: 550;
+}
+table th, table td{
+    border: 1px solid #DFDFDF;
+    height: 40px;
+}
+table td{
+    font-size: .14rem;
+}
+.table_bottom td{
+    border-bottom: 0;
+}
+
+/* 危急的颜色 */
+.critical{
+    background: #FE4F4F;
+    color: #FFFFFF;
+}
+/* 未读消息 */
+.message{
+    color: #6DC5C4;
+}
+/* 未处理 */
+.untreated{
+    color: #FD6363;
+}
+/* 处理中 */
+.handle{
+    color: #44ACD9;
+}
+/* 变色 */
+.bg_color{
+    background: #F9F9F9;
+}
+
+.el-pagination.is-background .el-pager li:not(.disabled).active{
+    background: #64C2C1;
+}
+.el-pagination.is-background .el-pager li{
+    color: #999999;
+}
+
+
+.paging{
+    display: flex;
+    flex-direction: row;
+    margin-left: .5%;
+}
+.paging span{
+    font-family: PingFangSC-Regular;
+    font-size:.14rem;
+    color: #666666;
+    margin-left: .5rem;
+    position: relative;
+    top: .05rem;
+}
+
+
+
+
