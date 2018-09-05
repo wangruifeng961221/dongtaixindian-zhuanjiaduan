@@ -7,24 +7,23 @@
     <meta id="metaEle" name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
     <title>登陆</title>
-    <script type="text/javascript" src="../common/jquery.min.js"></script>
-    <script type="text/javascript" src="../common/link.js"></script>
-    <!--<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">-->
-    <script src="../common/element/index.js"></script>
-
-    <link rel="stylesheet" href="../css/login.css">
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon"/>
+    <script type="text/javascript" src="/common/jquery.min.js"></script>
+    <script type="text/javascript" src="/common/link.js"></script>
+    <script src="/common/element/index.js"></script>
+    <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
 <div class="container" id="app" v-cloak>
-    <img src="../img/login_logo.png" class="logo">
+    <img src="/img/login_logo.png" class="logo">
     <div v-if="!retrieveFlag" class="content">
-        <img src="../img/image.png" class="img_left">
+        <img src="/img/image.png" class="img_left">
         <div class="login_zj">
             <form id="login_from" @keyup.enter="sign">
             <p class="title">专家登录</p>
             <div class="account">
                 <div class="account_icon">
-                    <img src="../img/icon_accountnumber.png" class="account_pic">
+                    <img src="/img/icon_accountnumber.png" class="account_pic">
                     <span class="line"></span>
                 </div>
                 <label style="display: none" id="v_title">账号</label>
@@ -40,7 +39,7 @@
             </div>
             <div class="account password">
                 <div class="account_icon">
-                    <img src="../img/icon_password.png" class="account_pic">
+                    <img src="/img/icon_password.png" class="account_pic">
                     <span class="line"></span>
                 </div>
                 <label id="v_psd" style="display: none">密码</label>
@@ -58,8 +57,8 @@
             </form>
             <div class="member">
                     <span @click="remember">
-                    <img src="../img/btn_checkbox_se.png" v-if="flag">
-                    <img src="../img/btn_checkbox_nor.png" v-if="!flag">
+                    <img src="/img/btn_checkbox_se.png" v-if="flag">
+                    <img src="/img/btn_checkbox_nor.png" v-if="!flag">
                     <span class="title">记住用户名和密码</span>
                     </span>
                 <span class="retrieve" @click="retrieve">找回密码</span>
@@ -67,7 +66,7 @@
         </div>
     </div>
     <div v-if="retrieveFlag" class="zh_retrieve">
-        <img src="../img/cupop_btn_close2.png" title="关闭" class="close" @click="close">
+        <img src="/img/cupop_btn_close2.png" title="关闭" class="close" @click="close">
         <p class="title_password">找回密码</p>
         <form id="modify_psd" @keyup.enter="modifyBtn">
         <label id="v_phone" style="display: none">手机号码</label>
@@ -168,6 +167,7 @@
                             $.cookie(expert.cookie_key, this.loginData.accessKey, Cookie_accessKey);
                             $.cookie(expert.role, this.loginData.role, Cookie_accessKey);
                             $.cookie(expert.id, this.loginData.userUnique, Cookie_accessKey);
+                            // $.cookie(expert.loginname, this.loginData.loginName, Cookie_accessKey);
                             location.href = expert.homeUrl + 'all_consultation.html';
                         }else {
                             this.$message(res.Error);

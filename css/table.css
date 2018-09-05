@@ -10,9 +10,9 @@
 }
 .all_con{
     width: 16.6rem;
-    min-height: 800px;
+    min-height: 730px;
     border: 1px solid #DFDFDF;
-    height: 800px;
+    /*height: 800px;*/
     background: #FFFFFF;
 }
 
@@ -43,7 +43,7 @@
     font-size: .14rem;
 }
 .search_header{
-    padding: .32rem .1rem 0 .1rem;
+    padding: .32rem .1rem 0 .16rem;
 }
 .el-date-editor.el-input{
     margin-right: .2rem;
@@ -82,7 +82,7 @@ table td{
 }
 
 /* 危急的颜色 */
-.critical{
+#critical{
     background: #FE4F4F;
     color: #FFFFFF;
 }
@@ -101,6 +101,11 @@ table td{
 /* 变色 */
 .bg_color{
     background: #F9F9F9;
+}
+
+/* 白色字体 */
+#font_w{
+    color: #ffffff;
 }
 
 .el-pagination.is-background .el-pager li:not(.disabled).active{
@@ -123,6 +128,12 @@ table td{
     margin-left: .5rem;
     position: relative;
     top: .05rem;
+}
+.nodata{
+    font-family: PingFangSC-Regular;
+    font-size:.14rem;
+    color: #666666;
+    margin-left: .5rem;
 }
 
 

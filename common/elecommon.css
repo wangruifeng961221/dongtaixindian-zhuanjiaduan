@@ -14,6 +14,8 @@
     font-size: .14rem;
     margin-top: .2rem;
 }
+
+
 /* 解决闪烁问题 */
 [v-cloak] {
     display: none;

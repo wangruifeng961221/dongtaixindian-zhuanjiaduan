@@ -6,17 +6,20 @@
     <meta name="x5-orientation" content="portrait">
     <meta id="metaEle" name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
-    <title>全部会诊</title>
-    <script type="text/javascript" src="../common/jquery.min.js"></script>
-    <script type="text/javascript" src="../common/link.js"></script>
-    <script src="../common/element/index.js"></script>
-    <link rel="stylesheet" href="../css/all_consultation.css">
-    <link rel="stylesheet" href="../css/header.css">
-    <link rel="stylesheet" href="../css/menu.css">
-    <link rel="stylesheet" href="../css/table.css">
+    <title>会诊</title>
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon"/>
+    <script type="text/javascript" src="/common/jquery.min.js"></script>
+    <script type="text/javascript" src="/common/link.js"></script>
+    <script src="/common/element/index.js"></script>
+    <script type="text/javascript" src="/js/Web_SDK_Base_v2.4.0.js"></script>
+    <script type="text/javascript" src="/js/Web_SDK_NIM_v2.4.0.js"></script>
+    <link rel="stylesheet" href="/css/all_consultation.css">
+    <link rel="stylesheet" href="/css/header.css">
+    <link rel="stylesheet" href="/css/menu.css">
+    <link rel="stylesheet" href="/css/table.css">
 </head>
 <body>
-<div class="continue_etcomm" id="app">
+<div class="continue_etcomm" id="app" v-cloak>
     <!--  头部-->
     <div class="header_etcomm">
 
@@ -24,7 +27,26 @@
     <div class="main_etcomm">
         <!--菜单 -->
         <div class="menu_etcomm">
-
+            <ul class="menu" id="memu">
+                <li :class="allFlag?'selected_menu':''" @click="toAll">
+                    <img src="/img/navbar_icon_all_nor.png" v-if="!allFlag">
+                    <img src="/img/navbar_icon_all_se.png" v-if="allFlag">
+                    <span>全部会诊</span>
+                </li>
+                <li :class="newFlag?'selected_menu':''" @click="toNew">
+                    <img src="/img/navbar_icon_request_nor.png" v-if="!newFlag">
+                    <img src="/img/navbar_icon_request_se.png" v-if="newFlag">
+                    <span>新请求
+            <i class="new_req" v-if="newCount<=99">{{newCount}}</i>
+            <i class="new_req" v-else>99</i>
+        </span>
+                </li>
+                <li :class="completFlag?'selected_menu':''" @click="toComplet">
+                    <img src="/img/navbar_icon_complet_nor.png" v-if="!completFlag">
+                    <img src="/img/nacbar_icon_complet_se.png" v-if="completFlag">
+                    <span>已会诊</span>
+                </li>
+            </ul>
         </div>
         <!-- 全部会诊-->
         <div class="all">
@@ -51,10 +73,10 @@
                             placeholder="请选择结束日期">
                     </el-date-picker>
                     <el-input v-model="search" placeholder="请输入关键字" class="search"></el-input>
-                    <span class="search_btn">搜索</span>
+                    <span class="search_btn" @click="searchVal">搜索</span>
                 </div>
-                <div class="frame">
-                    <table cellspacing="0">
+                <div class="frame" v-loading="loading" element-loading-text="拼命加载中">
+                    <table cellspacing="0" v-loading="loading2" element-loading-text="正在接单中...请等待">
                         <thead>
                         <tr>
                             <th style="border-left: 0;">危机</th>
@@ -66,26 +88,29 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr v-for="(item,index) in 10" :key="index"
+                        <tr v-for="(item,index) in dataList" :key="index"
                             :class="[(index+1)%2==0?'':'bg_color',(index+1)==10?'table_bottom':'']"
-                            @click="handleClick">
+                            :id="item.isUrgent?'critical':''"
+                            @click="handleClick(item.orderStatus,item.taskUnique,item.unreadCount,item.isUrgent)"
+                            style="cursor: pointer">
                             <td style="border-left: 0">
-                                <img src="../img/icon_crisis.png">
+                                <img :src="item.isUrgent?'/img/icon_crisis.png':''">
                             </td>
                             <td>
-                                2018-05-23 09:00
+                                {{item.addDate}}&nbsp;&nbsp;{{item.addTime}}
                             </td>
                             <td>
-                                docter01
+                                {{item.docLoginName}}
                             </td>
                             <td>
-                                方医生
+                                {{item.docName}}
                             </td>
-                            <td>
-                                未处理
+                            <td :class="[item.orderStatus=='新请求'?'untreated':'',item.orderStatus=='处理中'?'handle':'']"
+                                :id="item.isUrgent?'font_w':''">
+                                {{item.orderStatus}}
                             </td>
-                            <td style="border-right:0">
-                                无
+                            <td style="border-right:0" :class="item.unreadCount>0?'message':''">
+                                {{item.unreadCount}}
                             </td>
                         </tr>
                         </tbody>
@@ -94,152 +119,196 @@
                 <!-- 分页 -->
                 <div class="paging">
                     <el-pagination
+                            v-if="dataList.length>0"
                             background
                             :page-size.sync="pageSize"
                             @current-change="change"
                             layout="prev, pager, next"
-                            :total="1000">
+                            :total="total">
                     </el-pagination>
-                    <span>每页{{pageSize}}条，共{{pageSize}}条</span>
-                    <!--<span>暂无数据</span>-->
+                    <span v-if="dataList.length>0">每页{{pageSize}}条，共{{total}}条</span>
+
                 </div>
+                <span v-if="dataList.length<=0" class="nodata">暂无数据</span>
             </div>
         </div>
-
     </div>
     <!-- 接单成功 -->
     <div class="success" v-if="successFlag">
-        <img src="../img/identification_icon_success.png">
+        <img src="/img/identification_icon_success.png">
         <span>接单成功</span>
     </div>
     <!-- 处理中 -->
-    <div class="in_hand" v-if="inHand">
+    <div class="in_hand" v-show="inHand" v-loading.fullscreen="loading" element-loading-text="正在提交中...请等待">
         <div class="hand">
             <div class="header_hand">
-                <img src="../img/logo03.png">
+                <img src="/img/logo03.png">
                 <div class="hang_r">
-                    <span class="xz_hand">下载报告</span>
-                    <span @click="chatFlag=true">会诊会话
-                        <i class="conversation"></i>
+                    <a class="xz_hand" :href="myDownLoad" downLoad>下载报告</a>
+                    <span @click="openChat">会诊会话
+                        <i class="conversation" v-if="redNewMessage"></i>
                     </span>
                 </div>
             </div>
             <div class="xd_img">
-                <div class="img_border">
-                    <img src="../img/image_bc.png">
+                <div class="img_border" id="pdf">
+                    <iframe :src="iframeUrl" frameborder="0" style="width: 100%;height: 100%"></iframe>
                 </div>
                 <div class="data_xd">
-                    <span class="danger">危险</span>
-                    <ul class="lists">
-                        <li>检测时间：<span>2018-08-06 008:52:11</span></li>
-                        <li>请求用户：<span>张先虎&nbsp;&nbsp;&nbsp;&nbsp;13033406556</span></li>
-                        <li>患者信息：<span>YUSLL&nbsp;&nbsp;&nbsp;&nbsp;男/33</span></li>
-                        <li>主述&nbsp;/&nbsp;病史 ：<span class="history_illness"></span><span>心胸心胸心胸心胸心胸心胸</span></li>
-                    </ul>
-                    <!-- 诊断结果 -->
-                    <div>
-                        <div class="title_commonly">
-                            <span class="title">诊断结果:</span>
-                            <span class="commonly" @click="diagnostic">常用诊断</span>
+                    <form id="sub_mission">
+                        <span class="danger" v-if="isUrgent">危险</span>
+                        <ul class="lists">
+                            <li>测量时间：<span>{{inHandData.MeasureTime}}</span></li>
+                            <li>请求用户：<span>{{inHandData.docName}}&nbsp;&nbsp;&nbsp;&nbsp;{{inHandData.docPhone}}</span>
+                            </li>
+                            <li>患者信息：<span>{{inHandData.PatientName}}&nbsp;&nbsp;&nbsp;&nbsp;<span
+                                    v-if="inHandData.PatientGender=='1'">男</span><span
+                                    v-if="inHandData.PatientGender=='0'">女</span>/{{inHandData.PatientAge}}</span>
+                            </li>
+                            <li>主述&nbsp;/&nbsp;病史 ：<span class="history_illness"></span><span>{{inHandData.Portrait}}/{{inHandData.MedicalHistory}}</span>
+                            </li>
+                        </ul>
+                        <!-- 诊断结果 -->
+                        <div>
+                            <div class="title_commonly">
+                                <span class="title">诊断结果:</span>
+                                <span class="commonly" @click="diagnostic">常用诊断</span>
+                            </div>
+                            <label id="v_zd" style="display: none">诊断结果</label>
+                            <el-input
+                                    vname="v_zd"
+                                    validator="notNull"
+                                    type="textarea"
+                                    :rows="2"
+                                    resize="none"
+                                    maxlength="65"
+                                    placeholder="请输入诊断结果"
+                                    @keyup.delete.native="deleteDiagnostic"
+                                    v-model="textareaZD">
+                            </el-input>
                         </div>
-                        <el-input
-                                type="textarea"
-                                :rows="2"
-                                resize="none"
-                                maxlength="65"
-                                placeholder="请输入诊断结果"
-                                @keyup.delete.native="deleteDiagnostic"
-                                v-model="textareaZD">
-                        </el-input>
-                    </div>
-                    <!-- 专家建议 -->
-                    <div class="proposal">
-                        <div class="title_commonly">
-                            <span class="title">专家建议:</span>
-                            <span class="commonly">常用建议</span>
+                        <!-- 专家建议 -->
+                        <div class="proposal">
+                            <div class="title_commonly">
+                                <span class="title">专家建议:</span>
+                                <span class="commonly" @click="commonSugg">常用建议</span>
+                            </div>
+                            <label id="v_jy" style="display: none">专家建议</label>
+                            <el-input
+                                    vname="v_jy"
+                                    validator="notNull"
+                                    type="textarea"
+                                    :rows="2"
+                                    resize="none"
+                                    maxlength="65"
+                                    placeholder="请输入建议"
+                                    v-model="textareaJY">
+                            </el-input>
                         </div>
-                        <el-input
-                                type="textarea"
-                                :rows="2"
-                                resize="none"
-                                maxlength="65"
-                                placeholder="请输入建议"
-                                v-model="textareaJY">
-                        </el-input>
-                    </div>
-                    <!-- 紧急程度 -->
-                    <div class="urgent">
-                        <span class="title">紧急程度:</span>
-                        <div class="urgent_list">
-                            <div class="urgent_category" v-for="(item,index) in urgentData" @click="radioChange(index)"
-                                 :class="index==2?'max_r_n':''">
-                                <img src="../img/btn_checkbox_nor.png" v-if="!flagImg[index]">
-                                <img src="../img/btn_checkbox_se.png" v-if="flagImg[index]">
-                                <span>{{item}}</span>
+                        <!-- 紧急程度 -->
+                        <div class="urgent">
+                            <span class="title">紧急程度:</span>
+                            <div class="urgent_list">
+                                <div class="urgent_category" v-for="(item,index) in urgentData"
+                                     @click="radioChange(index)"
+                                     :class="index==2?'max_r_n':''">
+                                    <img src="/img/btn_checkbox_nor.png" v-if="!flagImg[index]">
+                                    <img src="/img/btn_checkbox_se.png" v-if="flagImg[index]">
+                                    <span>{{item}}</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <span class="sub_urgent">提交</span>
-                    <div class="Tips">
-                        <img src="../img/Tips.png">
-                        <span>此结论提交将无法更改，请确认结论进行提交</span>
-                    </div>
+                        <div class="errorText error" style="margin-left: 20px!important;"></div>
+                        <span class="sub_urgent" @click="subUrgent">提交</span>
+                        <div class="Tips">
+                            <img src="/img/Tips.png">
+                            <span>此结论提交将无法更改，请确认结论进行提交</span>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-        <img src="../img/close_hand.png" class="close_cupop_btn" @click="closeCupop">
+        <img src="/img/close_hand.png" class="close_cupop_btn" @click="closeCupop">
     </div>
     <!-- 提交成功 -->
-    <div class="success" v-if="successFlag">
-        <img src="../img/identification_icon_success.png">
+    <div class="success" v-if="successTitleFlag">
+        <img src="/img/identification_icon_success.png">
         <span>提交成功</span>
     </div>
     <!-- 提交后 -->
-    <div class="in_hand" v-if="handed">
+    <div class="in_hand" v-show="handed">
         <div class="hand">
             <div class="header_hand">
-                <img src="../img/logo03.png">
+                <img src="/img/logo03.png">
                 <div class="hang_r">
-                    <span class="xz_hand">下载报告</span>
-                    <span>会诊会话
-                        <i class="conversation"></i>
+                    <a class="xz_hand" :href="myDownLoad" downLoad>下载报告</a>
+                    <span @click="openChat">会诊会话
+                        <i class="conversation" v-if="redNewMessage"></i>
                     </span>
                 </div>
             </div>
             <div class="xd_img">
                 <div class="img_border">
-                    <img src="../img/image_bc.png">
+                    <iframe :src="iframeUrl" frameborder="0" style="width: 100%;height: 100%"></iframe>
                 </div>
                 <div class="data_xd">
-                    <span class="danger">危险</span>
+                    <span class="danger" v-if="inHandData.UrgencyLevel==0">危险</span>
                     <ul class="lists">
-                        <li>检测时间：<span>2018-08-06 008:52:11</span></li>
-                        <li>请求用户：<span>张先虎&nbsp;&nbsp;&nbsp;&nbsp;13033406556</span></li>
-                        <li>患者信息：<span>YUSLL&nbsp;&nbsp;&nbsp;&nbsp;男/33</span></li>
-                        <li class="title_top">主述&nbsp;/&nbsp;病史： <span
-                                class="history_illness"></span><span>心胸心胸心胸心胸心胸心胸</span></li>
-                        <li class="title_top">诊断结果：<span class="history_illness"></span><span>心胸心胸心心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸心胸胸心胸心胸心胸</span>
+                        <li>测量时间：<span>{{inHandData.MeasureTime}}</span></li>
+                        <li>请求用户：<span>{{inHandData.docName}}&nbsp;&nbsp;&nbsp;&nbsp;{{inHandData.docPhone}}</span></li>
+                        <li>患者信息：<span>{{inHandData.PatientName}}&nbsp;&nbsp;&nbsp;&nbsp;<span
+                                v-if="inHandData.PatientGender=='1'">男</span><span v-if="inHandData.PatientGender=='0'">女</span>/{{inHandData.PatientAge}}</span>
                         </li>
-                        <li class="title_top">专家建议：<span class="history_illness"></span><span>心胸心胸心胸心胸心胸心胸</span></li>
-                        <li class="title_top">紧急程度：<span class="history_illness"></span><span>心胸心胸心胸心胸心胸心胸</span></li>
+                        <li class="title_top">主述&nbsp;/&nbsp;病史： <span
+                                class="history_illness"></span><span>{{inHandData.Portrait}}/{{inHandData.MedicalHistory}}</span>
+                        </li>
+                        <li class="title_top">诊断结果：<span class="history_illness"></span><span
+                                style="word-break:break-all;">{{inHandData.Analysis}}</span>
+                        </li>
+                        <li class="title_top">专家建议：<span
+                                class="history_illness"></span><span>{{inHandData.Conclusion}}</span></li>
+                        <li class="title_top">紧急程度：<span class="history_illness"></span>
+                            <span v-if="inHandData.UrgencyLevel==0">非常紧急</span>
+                            <span v-if="inHandData.UrgencyLevel==1">酌情紧急</span>
+                            <span v-if="inHandData.UrgencyLevel==2">一般紧急</span>
+                            <span v-if="inHandData.UrgencyLevel==3">正常报告</span>
+                            <span v-if="inHandData.UrgencyLevel==4">无效报告</span>
+                        </li>
                     </ul>
                 </div>
             </div>
         </div>
-        <img src="../img/close_hand.png" class="close_cupop_btn" @click="closeed">
+        <img src="/img/close_hand.png" class="close_cupop_btn" @click="closeed">
     </div>
     <!-- 诊断模板 -->
     <div class="diagnostic" v-if="diagnosticFlag" :key="Math.random()">
         <div class="diagnostic_content">
             <div class="diagnostic_header">
-                <p>诊断模板</p>
-                <img src="../img/cupop_btn_close2.png" @click="diagnosticFlag=false">
+                <p v-if="isShowflag=='Diagnosis'">诊断模板</p>
+                <p v-if="isShowflag=='Proposal'">诊断建议</p>
+                <img src="/img/cupop_btn_close2.png" @click="diagnosticFlag=false">
             </div>
             <div class="diagnostic_body">
                 <div class="diagnostic_title">
-                    <span>常用诊断</span>
-                    <span>我的诊断</span>
-                    <div class="add_zd" @click="addDiagnosisFlag=true"><img src="../img/add_icon.png">添加诊断</div>
+                    <span @click="commonDiagnosis" id="com_dia" :id="templateType==2?'diagnostic_title_bg':''"
+                          v-if="isShowflag=='Proposal'">常用建议</span>
+
+                    <span @click="commonDiagnosis" id="com_dia" :id="templateType==0?'diagnostic_title_bg':''"
+                          v-if="isShowflag=='Diagnosis'">常用诊断</span>
+
+                    <span @click="myDiagnosis" id="my_dia" :id="templateType==3?'diagnostic_title_bg':''"
+                          v-if="isShowflag=='Proposal'">我的建议</span>
+
+                    <span @click="myDiagnosis" id="my_dia" :id="templateType==1?'diagnostic_title_bg':''"
+                          v-if="isShowflag=='Diagnosis'">我的诊断</span>
+
+                    <div class="add_zd" @click="addDiagnosis" v-if="isShowflag=='Proposal'"><img
+                            src="/img/add_icon.png">添加建议
+                    </div>
+
+                    <div class="add_zd" @click="addDiagnosis" v-if="isShowflag=='Diagnosis'"><img
+                            src="/img/add_icon.png">添加诊断
+                    </div>
                 </div>
                 <div class="diagnostic_data">
                     <div class="diagnostic_lsits" id="diagnostic">
@@ -247,17 +316,18 @@
                             <li v-for="(item,index) in templateData">
                                 <span class="select_title">
                                     <input type="checkbox"
-                                           :id="item.id"
-                                           :value="item.data"
+                                           :id="item.unique"
+                                           :value="item.templateContent"
                                            class="input_check"
                                            name="input_check"
                                            v-model="checkedNames"
                                            @change="changeDate"
                                            @click="changeEvent($event)"
                                     >
-                                    <label :for="item.id"></label>
+                                    <label :for="item.unique"></label>
                                 </span>
-                                <div class="diagnostic_nr" :class="index==0?'diagnostic_lsits_border_t':''">{{item.data}}</div>
+                                <div class="diagnostic_nr" :class="index==0?'diagnostic_lsits_border_t':''">
+                                    <span>{{item.templateContent}}</span></div>
                             </li>
                         </ul>
                     </div>
@@ -273,8 +343,9 @@
                             </div>
                         </div>
                         <div class="btn_temp">
-                            <span class="btn_qx" @click="aa">取消</span>
-                            <span class="btn_qd" @click="tempQD">确定</span>
+                            <span class="btn_qx" @click="diagnosticFlag = false;">取消</span>
+                            <span class="btn_qd" @click="tempQD" v-if="isShowflag=='Proposal'">确定</span>
+                            <span class="btn_qd" @click="tempQD" v-if="isShowflag=='Diagnosis'">确定</span>
                         </div>
                     </div>
                 </div>
@@ -285,16 +356,20 @@
     <div class="add_diagnosis" v-show="addDiagnosisFlag">
         <div class="add_diag_body">
             <div class="diagnostic_header">
-                <p>添加诊断模板</p>
-                <img src="../img/cupop_btn_close2.png" @click="addDiagnosisFlag=false">
+                <p v-if="isShowflag=='Diagnosis'">添加诊断模板</p>
+                <p v-if="isShowflag=='Proposal'">添加建议模板</p>
+
+                <img src="/img/cupop_btn_close2.png" @click="addDiagnosisFlag=false">
             </div>
-            <el-input v-model="addDiagnosis"
+            <el-input v-model="addDiagnosisVal"
                       placeholder="模板内容不能超过65个字符"
                       maxlength="65"
             ></el-input>
             <div class="btn_temp add_btn">
-                <span class="btn_qx" @click="addDiagnosisFlag=false">取消</span>
-                <span class="btn_qd">确定</span>
+                <span class="btn_qx" @click="addDiagnosisFlag=false;">取消</span>
+
+                <span class="btn_qd" @click="addDiagnosisBtn" v-if="isShowflag=='Diagnosis'">确定</span>
+                <span class="btn_qd" @click="addDiagnosisBtn" v-if="isShowflag=='Proposal'">确定</span>
             </div>
         </div>
     </div>
@@ -302,52 +377,110 @@
     <div class="chat" v-if="chatFlag">
         <div class="chat_header">
             <div class="name">
-                <img src="../img/icon_head.png">
-                <span>范主任</span>
+                <!--<img src="../img/defult_expert.png">-->
+                <img :src="expertInfo.faceIcon?headIcon:'/img/icon_head.png'" class="icon_head"
+                     style="vertical-align: text-top;width: 30px;height: 30px">
+                <span class="username_exp" style="top:4px;">{{expertInfo.userName}}</span>
             </div>
-            <div class="chat_history">
-                <img src="../img/btn_history.png">
-                <span>历史记录</span>
+            <div style="display: flex;justify-content: flex-end">
+                <div class="chat_history" @click="historyChat">
+                    <img src="/img/btn_history.png">
+                    <span>历史记录</span>
+                </div>
+                <div @click="callServer">
+                    <img src="/img/btn_customerservice.png">
+                    <span>呼叫客服</span>
+                </div>
+                <img src="/img/close_hand.png" class="chat_close" @click="closeChat">
             </div>
-            <div>
-                <img src="../img/btn_customerservice.png">
-                <span>呼叫客服</span>
-            </div>
-            <img src="../img/close_hand.png" class="chat_close" @click="chatFlag=false">
         </div>
         <div class="chat_body" id="chat_body">
-            <span class="chat_time">2018-08-08 10:00</span>
-            <div v-for="(item,index) in 8">
-                <div class="chat_other" v-if="index%2==0">
+            <div v-for="(item,index) in chatList" class="chat_img">
+                <!-- 医生 -->
+                <div class="chat_other" v-if="item.FromRole==0">
+                    <div class="chat_time">{{item.AddDate}} {{item.AddTime}}</div>
                     <div class="chat_other_header">
-                        <img src="../img/icon_head.png">
-                        <span>测试</span>
+                        <img src="/img/dialogue_doctor.png">
+                        <span style="display: block">{{item.username}}</span>
                     </div>
-                    <div class="chat_other_content">
-                        撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是撒打发斯蒂芬是
+                    <div style="overflow: hidden">
+                        <span class="chat_other_content" style="float: left">{{item.Content}}</span>
                     </div>
                 </div>
-                <div class="chat_own" v-else>
+                <!-- 客服 -->
+                <div class="chat_other" v-if="item.FromRole==2">
+                    <div class="chat_time">{{item.AddDate}} {{item.AddTime}}</div>
+                    <div class="chat_other_header">
+                        <img src="/img/dialogue_customerservice.png">
+                        <span style="display: block">{{item.username}}</span>
+                    </div>
+                    <div style="overflow: hidden">
+                        <span class="chat_other_content" style="float: left">{{item.Content}}</span>
+                    </div>
+                </div>
+                <!-- 心电助手 -->
+                <div class="chat_other" v-if="item.FromRole==5">
+                    <div class="chat_time">{{item.AddDate}} {{item.AddTime}}</div>
+                    <div class="chat_other_header">
+                        <img src="/img/dialogue_electrocardiogram.png">
+                        <!--<img src="../img/dialogue_customerservice.png">-->
+                        <span style="display: block">{{item.username}}</span>
+                    </div>
+                    <div style="overflow: hidden">
+                        <span class="chat_other_content" style="float: left">
+                            <!--{{item.Content}}-->
+                            名词解释<a
+                                :data-href="item.Content?urlXDZS+'/ECGnouns/'+JSON.parse(item.Content).link+'?rand='+ Math.random():''"
+                                @click="interpretation($event)" style="cursor: pointer;text-decoration: underline">【{{JSON.parse(item.Content).keyword}}】</a>
+                        </span>
+                    </div>
+                </div>
+                <!-- 专家 -->
+                <div class="chat_own" v-if="item.FromRole==1">
+                    <div class="chat_time">{{item.AddDate}} {{item.AddTime}}</div>
                     <div class="chat_other_header chat_own_header">
-                        <img src="../img/icon_head.png">
-                        <span>范主任</span>
+                        <img :src="expertInfo.faceIcon?headIcon:'/img/dialogue_expert.png'" class="icon_head">
+                        <!--<span style="display: block">{{item.FromUser}}</span>-->
+                        <span style="display: block">{{expertInfo.userName}}</span>
                     </div>
-                    <div class="chat_other_content chat_own_content">
-                        dsjasdfhsadhshdfhasdhfjasflhsalfhsahfkjashfhsakhfadsj
+                    <div style="overflow: hidden">
+                        <span class="chat_other_content chat_own_content" style="float: right">{{item.Content}}</span>
                     </div>
+                </div>
+                <!-- 系统通知 -->
+                <div style="text-align: center" v-if="item.FromRole==6">
+                    <span class="chat_time" style="background-color: #CCCCCC">{{item.Content}}</span>
                 </div>
             </div>
         </div>
-
-        <div class="chat_bottom" >
+        <div class="chat_bottom">
+            <el-pagination
+                    v-if="pageFlag&&chatList.length>0"
+                    small
+                    :page-size.sync="pageSize"
+                    @current-change="chatChange"
+                    background
+                    layout="prev, pager, next"
+                    :total="chatTotal">
+            </el-pagination>
             <el-input
+                    :disabled="consultationState==5||consultationState==6?false:true"
                     type="textarea"
                     placeholder="说点什么呢"
                     resize="none"
                     id="chat_bottom"
                     v-model="chatData">
             </el-input>
-            <span class="send_out">发送</span>
+            <span class="send_out" @click="sendMessage" :class="pageFlag?'':'chat_top'">发送</span>
+        </div>
+    </div>
+    <!-- 名词解释 -->
+    <div class="noun" v-show="nounFlag">
+        <div class="noun_content">
+            <div class="close_noun">
+                <img src="/img/cupop_btn_close2.png" @click="closeNoun">
+            </div>
+            <iframe src="" frameborder="0" id="noun_data" style="width: 100%;height: 100%"></iframe>
         </div>
     </div>
 </div>
@@ -356,8 +489,38 @@
         el: '#app',
         data() {
             return {
+                //聊天
+                expertInfo: {},   //专家信息
+                headIcon: '',   //头像
+                loginName: '',
+                consultationState: '',  //聊天状态
+                chatList: [],
+                i: -1,                     // 截取的length
+                chatCountDefault: '',  //记录上一次的条数
+                timer: '',             //定时器
+                nim: null,               //插件
+                nimFlag: true,         //判断是否已经停掉定时器
+                sendFlag: true,           //发送控制滚动条
+                pageFlag: false,      //历史记录分页
+                chatPageIndex: '',     //聊天分页 页数
+                chatTotal: 0,
+                redNewMessage: false,    //是否显示有新消息提示  红点
+                update: {},                   //动态显示未读条数
+                urlXDZS: expert.url,
+                nounFlag: false,             //名词解释
+                interpretationUrl: '',
+                //////////////////////////
+                loading: false,
+                loading2: false,
+                //菜单
+                allFlag: true,
+                newFlag: false,
+                completFlag: false,
+                type: '',
+                newCount: '',//新请求
                 value_start: '',
                 value_end: '',
+                pageIndex: '', //当前页
                 search: '',
                 pageSize: expert.pageSize,
                 pickerOptions0: {
@@ -374,130 +537,667 @@
                         return time.getTime() < this.value_start || time.getTime() > Date.now();
                     }
                 },
+                dataList: [],  //会诊列表
+                total: '',   //所有条数
                 successFlag: false,
+                myDownLoad: '',  //下载
+                iframeUrl: '',
                 textareaZD: '',//诊断
                 textareaJY: '',//建议
                 urgentData: ['非常紧急', '酌情紧急', '一般紧急', '正常报告', '无效报告'],
                 flagImg: [false, false, false, false, false],  //紧急程度
+                urgentIndex: '',
                 inHand: false,  //处理中
+                isUrgent:'',   //处理中紧急程度
+                inHandData: {},
                 handed: false,  //处理完
                 checkedNames: [],
-                selectTemp: '发送发送到发送到发送到发送到发送到发送到到',  //已选模板
+                selectTemp: '',  //已选模板
                 diagnosticFlag: false,  //诊断模板
-                addDiagnosis: '',// 添加模板
+                addDiagnosisVal: '',// 添加模板
                 addDiagnosisFlag: false, // 添加模板
-                chatData:'',// 聊天内容
-                chatFlag:false,
-                templateData: [{
-                    id: 'list_0',
-                    data: 'T播改变'
-                }, {
-                    id: '1',
-                    data: 'ST改变SSdfasdfasfasffasfasT改变SST改变SST改变SST改变SST改变SST改变SST改变S'
-                }, {
-                    id: '2',
-                    data: 'Q-T改dfasdfasd变'
-                }, {
-                    id: '3',
-                    data: 'Q改变'
-                }],// 常用诊断
+                chatData: '',// 聊天内容
+                chatFlag: false,
+                templateData: [],// 常用诊断,
+                addTemplateType: '',  //添加模板类型
+                isShowflag: '',   //用来区分用来区分建议和诊断
+                successTitleFlag: false
+            }
+        },
+        created() {
+            if (!$.cookie(expert.cookie_key)) {
+                window.location.href = expert.homeUrl + 'login.html';
             }
         },
         mounted() {
+            this.getExpertInfoName();
             this.initHeader();
-            this.initMenu();
+            this.getConsultationLis();
+            this.getNewCount();
         },
         methods: {
-            aa() {
-                $("input[name=input_check]").prop("checked", false);
-                setTimeout(() => {
-                    this.diagnosticFlag = false;
-                    console.log(this);
-                }, 1000);
+            //  获取专家个人信息
+            getExpertInfoName() {
+                let url = expert.url + '/api/Expert/GetExpInfo';
+                let params = {
+                    accessKey: $.cookie(expert.cookie_key),
+                    userUnique: $.cookie(expert.id),
+                };
+                $.get(url, params, res => {
+                    if (res.Status == Success) {
+                        this.expertInfo = res.data[0];
+                        this.headIcon = expert.ImgUrl + this.expertInfo.faceIcon;
+                        this.initNim();
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            // nim
+            initNim() {
+                if (null == this.nim) {
+                    this.nim = new NIM({
+                        debug: true, //是否开启日志, 开发者可以开启日志, 这样 SDK 会将关键操作的信息打印到控制台上, 便于调试
+                        //appKey: 'e3799bfb2a00f669b32a163a230d6667', // 在云信管理后台查看应用的 appKey
+                        appKey: 'fb1a6e97ed4517b1b39e519c4e24c6db', // 在云信管理后台查看应用的 appKey
+                        account: this.expertInfo.loginName, // 帐号, 应用内唯一
+                        token: this.expertInfo.loginName, // 应该使用 loginName // 帐号的 token, 用于建立连接
+                        db: false,
+                        onmsg: (msg) => {
+                            let obj = JSON.parse(msg.text);
+                            if (obj.NoticeTypesDescription == expert.newTalkMessage) {
+                                if (obj.Sender !== this.expertInfo.loginName) {    //记数
+                                    // this.redNewMessage = true;
+                                    let num = 0;
+                                    let id = obj.ThingUnique;
+                                    for (let i = 0; i < this.dataList.length; i++) {
+                                        if (this.dataList[i].taskUnique == id) {
+                                            this.update = this.dataList[i];
+                                        }
+                                    }
+                                    this.updateCount(this.update.unreadCount);
+                                    return;
+                                }
+                                else if (obj.Owner == this.expertInfo.loginName) {   //接收新消息
+                                    this.initSource(0, 99);
+                                    this.nimFlag = true;
+                                    return;
+                                }
+                            }
+                        }
+                    });
+                }
+            },
+            // 更新 未读数据
+            updateCount(num) {
+                if (num == 0) {
+                    num++;
+                    this.$set(this.update, "unreadCount", 1);
+                } else {
+                    this.$set(this.update, "unreadCount", num + 1);
+                }
+            },
+            //  停nim 和清理定时器
+            clearNimTime() {
+                this.chatList = [];
+                clearInterval(this.timer);
+                if (this.nimFlag) {
+                    this.nim.disconnect();
+                    this.nimFlag = false;
+                }
+                this.nim = null;
+            },
+            // 打开会话会诊
+            openChat() {
+                this.pageFlag = false;
+                this.chatFlag = true;
+                this.redNewMessage = false;
+                this.initNim();
+                this.initSource(0, 99);
+                this.timingGetInitSource();
+            },
+            //  发送
+            sendMessage() {
+                /*if (this.consultationState != 5 || this.chatData == ''||this.consultationState != 6) {
+                    return false;
+                }*/
+                let url = expert.url + '/api/IM/SendMessage?accessKey=' + $.cookie(expert.cookie_key) + '&thingUnique=' + this.taskUnique + '&msgContent=' + this.chatData;
+                let params = {
+                    accessKey: $.cookie(expert.cookie_key),
+                    thingUnique: this.taskUnique,
+                    msgContent: this.chatData
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.pageFlag = false;
+                        this.chatData = '';
+                        this.sendFlag = true;
+                        this.initSource(0,99);
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            //  获取数据 (默认第一次调用显示20 条数据，以后每调用一次，多显示一条)
+            initSource(pageIndex, pageSize) {
+                this.i++;
+                let url = expert.url + '/api/IM/QueryMessage?accessKey=' + $.cookie(expert.cookie_key);
+                let params = {
+                    pageIndex: pageIndex,
+                    pageSize: pageSize,
+                    thingUnique: this.taskUnique,
+                    skipRows: 0
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.chatList = res.data.reverse();
+                        if (this.chatList.length >= 20) {
+                            this.chatList = this.chatList.slice(this.chatList.length - 20 - this.i, this.chatList.length + this.i);
+                            // console.log(this.chatList.length);
+                            this.chatCountDefault = this.chatList.length + this.i;
+                            this.getUserName();
+                        } else {
+                            this.getUserName();
+                        }
+                        if (this.sendFlag && $('.chat_body')[0].scrollHeight) {
+                            setTimeout(() => {
+                                $('.chat_body').scrollTop($('.chat_body')[0].scrollHeight);
+                                this.sendFlag = true;
+                            }, 10);
+                        }
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            //  定时获取数据
+            timingGetInitSource() {
+                if (this.consultationState == expert.consultationing) {
+                    this.timer = setInterval(() => {
+                        this.initSource(0, this.chatCountDefault);
+                        this.i--;
+                        if (this.sendFlag) {
+                            $('.chat_body').scrollTop($('.chat_body')[0].scrollHeight);
+                            this.sendFlag = false;
+                        }
+                    }, 60000)
+                }
+            },
+            //  关闭对话框
+            closeChat() {
+                this.i = -1;
+                this.chatFlag = false;
+                this.clearNimTime();
+            },
+            //  根据loginName获取userName
+            getUserName() {
+                var arrUser = [];
+                var obj = {};
+                for (let i = 0; i < this.chatList.length; i++) {
+                    arrUser.push(this.chatList[i].FromUser);
+                }
+                if (arrUser.length <= 0) {
+                    return false;
+                }
+                let url = expert.url + '/api/Users/GetUserInfoByLoginName?accessKey=' + $.cookie(expert.cookie_key) + '&loginNameList=' + arrUser;
+                let params = {
+                    accessKey: $.cookie(expert.cookie_key),
+                    loginNameList: arrUser
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        for (let i = 0; i < res.data.length; i++) {
+                            obj[res.data[i].loginName] = res.data[i].userName;
+                            this.$set(this.chatList[i], 'username', res.data[i].userName);
+                        }
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            //  呼叫客服
+            callServer() {
+                let url = expert.url + '/api/Expert/ExpRequestCusDispute?accessKey=' + $.cookie(expert.cookie_key) + '&taskUnique=' + this.taskUnique;
+                let params = {
+                    accessKey: $.cookie(expert.cookie_key),
+                    taskUnique: this.taskUnique,
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.$message('呼叫客服成功,请等待客服接入');
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            chatChange(val) {
+                this.chatPageIndex = val - 1;
+                this.historyChat();
+            },
+            // 历史记录
+            historyChat() {
+                this.pageFlag = true;
+                let url = expert.url + '/api/IM/QueryMessage?accessKey=' + $.cookie(expert.cookie_key);
+                let params = {
+                    pageIndex: this.chatPageIndex,
+                    pageSize: expert.pageSize,
+                    thingUnique: this.taskUnique,
+                    skipRows: 0
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.chatTotal = parseInt(res.total);
+                        this.chatList = res.data.reverse();
+                        this.getUserName();
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            // 名词解释
+            interpretation(e) {
+                this.nounFlag = true;
+                this.interpretationUrl = e.target.getAttribute('data-href');
+                $('#noun_data').attr('src', this.interpretationUrl);
+            },
+            closeNoun() {
+                this.nounFlag = false;
+                this.interpretationUrl = '';
+            },
+            //////////////
+            toAll() {
+                this.newFlag = false;
+                this.completFlag = false;
+                this.allFlag = true;
+                this.dataList=[];
+                this.type = expert.all;
+                this.clearData();
+                this.getConsultationLis();
+            },
+            toNew() {
+                this.completFlag = false;
+                this.allFlag = false;
+                this.newFlag = true;
+                this.dataList=[];
+                this.type = expert.new;
+                this.clearData();
+                this.getConsultationLis();
+            },
+            toComplet() {
+                this.allFlag = false;
+                this.newFlag = false;
+                this.completFlag = true;
+                this.dataList=[];
+                this.type = expert.consultationed;
+                this.clearData();
+                this.getConsultationLis();
+            },
+            //  清除默认数据
+            clearData() {
+                this.value_start = '';
+                this.value_end = '';
+                this.search = '';
+                this.pageIndex = '';
             },
             initHeader() {
-                var templateSrc = '/ectommZhuanjia/page/header.html' + '?r=' + Math.random();
+                var templateSrc = '/page/header.html' + '?r=' + Math.random();
                 $('.header_etcomm').load(templateSrc); //load
             },
-            initMenu() {
-                var templateMenu = '/ectommZhuanjia/page/menu.html' + '?r=' + Math.random();
-                $('.menu_etcomm').load(templateMenu, {'name': '11'}); //load
+            searchVal() {
+                this.getConsultationLis();
+            },
+            // 获取新请求条数
+            getNewCount() {
+                let url = expert.url + '/api/Expert/ExpGetAssistList?accessKey=' + $.cookie(expert.cookie_key);
+                let params = {
+                    ConsultationType: 1,
+                    keyword: this.search,
+                    tradeDateFrom: this.value_start,
+                    tradeDateTo: this.value_end,
+                    pageIndex: this.pageIndex,
+                    pageSize: expert.pageSize,
+                    sortField: '',
+                    sortOrder: ''
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.newCount = res.total;
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            //  获取会诊列表
+            getConsultationLis() {
+                this.loading = true;
+                let url = expert.url + '/api/Expert/ExpGetAssistList?accessKey=' + $.cookie(expert.cookie_key);
+                let params = {
+                    ConsultationType: this.type ? this.type : expert.all,
+                    keyword: this.search,
+                    tradeDateFrom: this.value_start,
+                    tradeDateTo: this.value_end,
+                    pageIndex: this.pageIndex,
+                    pageSize: expert.pageSize,
+                    sortField: '',
+                    sortOrder: ''
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.dataList = res.data;
+                        this.total = res.total;
+                        this.loading = false;
+                        this.getNewCount();
+                        this.initNim();
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
             },
             changeStart() {
-                console.log(this.value_start);
+                this.getConsultationLis();
             },
             changeEnd() {
-                console.log(this.value_end);
+                this.getConsultationLis();
             },
             change(val) {
-                console.log(val);
+                this.pageIndex = val-1;
+                this.getConsultationLis();
             },
             radioChange(index) {
                 for (let i = 0; i <= 5; i++) {
                     this.$set(this.flagImg, i, false);
                 }
                 this.$set(this.flagImg, index, true);
+                this.urgentIndex = index;
             },
             closeCupop() {
+                this.i = -1;
                 this.textareaZD = '';
                 this.textareaJY = '';
+                this.chatFlag = false;
                 for (let i = 0; i <= 5; i++) {
                     this.$set(this.flagImg, i, false);
                 }
-                this.inHand = !this.inHand;
+                this.inHand = false;
+                this.clearNimTime();
+                this.getConsultationLis();
+                this.getNewCount();
             },
             closeed() {
+                this.i = -1;
+                this.chatFlag = false;
                 this.handed = !this.handed;
+                this.clearNimTime();
+                this.getConsultationLis();
+                this.getNewCount();
             },
             //  点击表格tr
-            handleClick() {
-                //  未处理
-                if ('1' == expert.Untreated) {
-                    this.successFlag = true;
-                    setTimeout(() => {
-                        this.successFlag = false;
-                        this.inHand = true;
-                    }, 1000);
-                    return false;
+            handleClick(state, taskUnique, count,isUrgent) {
+                if (state == expert.newData) {
+                    this.loading2 = true;
                 }
+                this.isUrgent=isUrgent;
+                count > 0 ? this.redNewMessage = true : this.redNewMessage = false;
+                $(".error").empty();
+                let url = expert.url + '/api/Diagnosis/ExpAcceptAssist?accessKey=' + $.cookie(expert.cookie_key) + '&thingUnique=' + taskUnique;
+                this.taskUnique = taskUnique;
+                let params = {
+                    accessKey: $.cookie(expert.cookie_key),
+                    thingUnique: taskUnique
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.loading2 = false;
+                        this.successFlag = true;
+                        setTimeout(() => {
+                            this.successFlag = false;
+                            this.closeCupop(); //清理默认数据
+                            this.inHand = true;
+                            this.getMeasurementRecord(taskUnique);
+                            this.getImg(taskUnique);
+                            this.downloadReport(taskUnique);
+                        }, 1000);
+                    } else {
+                        this.loading2 = false;
+                        if (state == expert.newData) {
+                            this.$message(res.Error);
+                        }
+                    }
+                });
                 //处理中
-                if ('2' == expert.Untreat) {
+                if (state == expert.consultation) {
+                    this.inHand = true;
+                    this.loading2 = false;
+                    this.getMeasurementRecord(taskUnique);
+                    this.getImg(taskUnique);
+                    this.downloadReport(taskUnique);
                     return false;
                 }
                 //已处理
-                if ('3' == expert.Already_processed) {
+                if (state == expert.handled) {
+                    this.handed = true;
+                    this.loading2 = false;
+                    this.getMeasurementRecordED(taskUnique);
+                    this.getImg(taskUnique);
+                    this.downloadReport(taskUnique);
                     return false;
                 }
             },
+            //  下载（pdf）
+            downloadReport(taskUnique) {
+                let url = expert.url + '/PdfFactory/PdfLoader.aspx?accessKey=' + $.cookie(expert.cookie_key) + '&thingUnique=' + taskUnique;
+                this.myDownLoad = url;
+            },
+            getImg(taskUnique) {
+                let url = expert.url + '/PdfFactory/pdf_js/viewer/pdfViewer.aspx?accessKey=' + $.cookie(expert.cookie_key) + '&thingUnique=' + taskUnique;
+                this.iframeUrl = url;
+            },
+            // 获取测量记录 处理后
+            getMeasurementRecordED(taskUnique) {
+                let url = expert.url + '/api/Thing/GetThingById?accessKey=' + $.cookie(expert.cookie_key) + '&thingUnique=' + taskUnique;
+                let params = {
+                    accessKey: $.cookie(expert.cookie_key),
+                    thingUnique: taskUnique
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.inHandData = res.data[0];
+                        this.consultationState = res.data[0].state;
+                        this.handed = true;
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            // 获取测量记录 处理中
+            getMeasurementRecord(taskUnique) {
+                let url = expert.url + '/api/Thing/GetThingById?accessKey=' + $.cookie(expert.cookie_key) + '&thingUnique=' + taskUnique;
+                let params = {
+                    accessKey: $.cookie(expert.cookie_key),
+                    thingUnique: taskUnique
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.inHandData = res.data[0];
+                        this.consultationState = res.data[0].state;
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            //  常用诊断
+            commonDiagnosis() {
+                if (this.isShowflag == expert.isProposal) {  //建议
+                    this.templateType = expert.proposal;
+                    this.DiagnosisList();
+                } else if (this.isShowflag == expert.isDiagnosis) {  //诊断
+                    this.templateType = expert.diagnosis;
+                    this.DiagnosisList();
+                }
+            },
+            //  我的诊断
+            myDiagnosis() {
+                if (this.isShowflag == expert.isProposal) {  //建议
+                    this.templateType = expert.MyProposal;
+                    this.DiagnosisList();
+                } else if (this.isShowflag == expert.isDiagnosis) {  //诊断
+                    this.templateType = expert.MyDiagnosis;
+                    this.DiagnosisList();
+                }
+            },
+            // 常用建议 外层
+            commonSugg() {
+                this.isShowflag = expert.isProposal;
+                $("input[name=input_check]").prop("checked", false);
+                this.selectTemp = '';
+                this.checkedNames = [];
+                this.diagnosticFlag = !this.diagnosticFlag;
+                this.templateType = expert.proposal;
+                this.DiagnosisList();
+            },
+            //     诊断模板  flag  外层
+            diagnostic() {
+                this.isShowflag = expert.isDiagnosis;
+                $("input[name=input_check]").prop("checked", false);
+                this.selectTemp = '';
+                this.checkedNames = [];
+                this.diagnosticFlag = !this.diagnosticFlag;
+                this.templateType = expert.diagnosis;
+                this.DiagnosisList();
+            },
+            // 获取常用诊断列表
+            DiagnosisList() {
+                let url = expert.url + '/api/Template/ListTemplate?accessKey=' + $.cookie(expert.cookie_key);
+                let params = {
+                    pageIndex: '0',
+                    pageSize: '100',
+                    templateType: this.templateType,
+                    templateContent: '',
+                    operatorLoginName: '',
+                    OperatorDateFrom: '',
+                    OperatorDateDateTo: ''
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.templateData = res.data;
+                    } else {
+                        this.$message(res.Error);
+                    }
+                })
+            },
+            //  添加诊断
+            addDiagnosis() {
+                if (this.isShowflag == expert.isProposal) {  //建议
+                    this.addDiagnosisFlag = true;
+                    this.addDiagnosisVal = '';
+                    this.addTemplateType = expert.addProposal;
+                } else if (this.isShowflag == expert.isDiagnosis) {  //诊断
+                    this.addDiagnosisFlag = true;
+                    this.addDiagnosisVal = '';
+                    this.addTemplateType = expert.addDiagnosis;
+                }
+            },
+            //  添加诊断提交
+            addDiagnosisBtn() {
+                if (this.addDiagnosisVal == '' || this.addDiagnosisVal == undefined) {
+                    this.$message('内容不能为空');
+                    return false;
+                }
+                let url = expert.url + '/api/Template/AddTemplate?accessKey=' + $.cookie(expert.cookie_key);
+                let params = {
+                    templateType: this.addTemplateType,
+                    templateContent: this.addDiagnosisVal
+                };
+                $.post(url, params, res => {
+                    if (res.Status == Success) {
+                        this.$message('添加成功');
+                        if (this.isShowflag == expert.isProposal) {  //建议
+                            this.templateType = expert.proposal;
+                            this.DiagnosisList();
+                        } else if (this.isShowflag == expert.isDiagnosis) {  //诊断
+                            this.templateType = expert.diagnosis;
+                            this.DiagnosisList();
+                        }
+                        setTimeout(res => {
+                            this.addDiagnosisFlag = false;
+                        }, 1000);
+                    } else {
+                        this.$message(res.Error);
+                    }
+                });
+            },
             changeEvent(event) {
-                let value=event.target.value;
-                console.log(this.selectTemp.length + value.length);
-                if (this.selectTemp.length+value.length>65) {
+                let _id=event.target.id;
+                let Top=$('#diagnostic').scrollTop();
+                setTimeout(()=>{
+                    $('#diagnostic').scrollTop(Top);
+                });
+                if(!$("input[id=" + _id + "]").prop('checked')){
+                    return false;
+                }
+                let value = event.target.value;
+                if (this.selectTemp.length + value.length > 65) {
                     let target = event.target.id;
-                    $("input[id="+target+"]").prop("checked", false);
+                    $("input[id=" + target + "]").prop("checked", false);
+                    this.$message('您选择已超过65个字');
                     return false;
                 }
             },
             changeDate() {
-                let data='';
-                for(let i=0;i<this.checkedNames.length;i++){
-                    data=data+this.checkedNames[i]+';';
+                let data = '';
+                for (let i = 0; i < this.checkedNames.length; i++) {
+                    data = data + this.checkedNames[i] + '；';
                 }
-                this.selectTemp=data;
-            },
-            //     诊断模板  flag
-            diagnostic() {
-                this.selectTemp = '';
-                this.diagnosticFlag = !this.diagnosticFlag;
+                this.selectTemp = data;
             },
             //诊断模板确定
-            tempQD(){
-                this.textareaZD=this.selectTemp;
-                this.diagnosticFlag=false;
+            tempQD() {
+                if (this.isShowflag == expert.isProposal) {  //建议
+                    this.textareaJY = this.selectTemp;
+                    this.diagnosticFlag = false;
+
+                } else if (this.isShowflag == expert.isDiagnosis) {   //诊断
+                    this.textareaZD = this.selectTemp;
+                    this.diagnosticFlag = false;
+                }
+            },
+            //  处理中 提交
+            subUrgent() {
+                if (validateForm(sub_mission)) {
+                    if (this.urgentIndex === '' || this.urgentIndex === undefined) {
+                        $('.error').html('请选择紧急程度');
+                        return false;
+                    }
+                    this.loading = true;
+                    let url = expert.url + '/api/Diagnosis/ExpEditDiagnosisConclusion?accessKey=' + $.cookie(expert.cookie_key) + '&thingUnique=' + this.taskUnique + '&expertDiagnosis=' + this.textareaZD + '&expertAdvice=' + this.textareaJY + '&urgencyLevel=' + this.urgentIndex;
+                    let params = {
+                        accessKey: $.cookie(expert.cookie_key),
+                        thingUnique: this.taskUnique,
+                        expertDiagnosis: this.textareaZD,
+                        expertAdvice: this.textareaJY,
+                        urgencyLevel: this.urgentIndex
+                    };
+                    $.post(url, params, res => {
+                        if (res.Status == Success) {
+                            this.loading = false;
+                            this.successTitleFlag = true;
+                            setTimeout(() => {
+
+                                this.successTitleFlag = false;
+                                this.inHand = false;
+                                this.handed = true;
+                                this.getMeasurementRecordED(this.taskUnique);
+                                this.getImg(this.taskUnique);
+                                this.downloadReport(this.taskUnique);
+                            }, 1000)
+                        } else {
+                            this.$message(res.Error);
+                        }
+                    })
+                }
             },
             //  删除诊断
-            deleteDiagnostic(){
-                console.log(this.textareaZD);
+            deleteDiagnostic() {
             },
         }
     })
