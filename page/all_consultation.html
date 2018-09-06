@@ -37,8 +37,8 @@
                     <img src="/img/navbar_icon_request_nor.png" v-if="!newFlag">
                     <img src="/img/navbar_icon_request_se.png" v-if="newFlag">
                     <span>新请求
-            <i class="new_req" v-if="newCount<=99">{{newCount}}</i>
-            <i class="new_req" v-else>99</i>
+            <i class="new_req" v-if="newCount<=99&&newCount>0">{{newCount}}</i>
+            <i class="new_req" style="font-size: 0.1rem" v-if="newCount>99">99+</i>
         </span>
                 </li>
                 <li :class="completFlag?'selected_menu':''" @click="toComplet">
@@ -129,7 +129,7 @@
                     <span v-if="dataList.length>0">每页{{pageSize}}条，共{{total}}条</span>
 
                 </div>
-                <span v-if="dataList.length<=0" class="nodata">暂无数据</span>
+                <span v-if="dataList.length<=0" class="nodata" style="position: absolute;top: 34%;left: 47%;">暂无数据</span>
             </div>
         </div>
     </div>
@@ -207,7 +207,33 @@
                         </div>
                         <!-- 紧急程度 -->
                         <div class="urgent">
-                            <span class="title">紧急程度:</span>
+                            <span class="title">紧急程度:</span> <span class="urgent_img_u"><img src="/img/btn_question.png" style="cursor: pointer;vertical-align: text-bottom">
+                            <div class="hover_urgent">
+                                <p>报告评估详情</p>
+                                <ul>
+                                    <li>
+                                        <p>非常紧急</p>
+                                        <span>患者病情非常紧急，需立即转到上级医院就诊！</span>
+                                    </li>
+                                    <li>
+                                        <p>酌情紧急</p>
+                                        <span>患者病情可能随时变化，症状不缓解或加重考虑到上级医院就诊。</span>
+                                    </li>
+                                    <li>
+                                        <p>一般紧急</p>
+                                        <span>患者病情需要对症治疗或动态观察，择期复查心电图或其他辅助检查。</span>
+                                    </li>
+                                    <li>
+                                        <p>正常报告</p>
+                                        <span>患者未发现心脏疾病异常，可以考虑发作时复查心电图。</span>
+                                    </li>
+                                    <li>
+                                        <p>无效报告</p>
+                                        <span>干扰严重，导联接错，导联脱落等无法诊断的报告。</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            </span>
                             <div class="urgent_list">
                                 <div class="urgent_category" v-for="(item,index) in urgentData"
                                      @click="radioChange(index)"
@@ -471,7 +497,7 @@
                     id="chat_bottom"
                     v-model="chatData">
             </el-input>
-            <span class="send_out" @click="sendMessage" :class="pageFlag?'':'chat_top'">发送</span>
+            <span class="send_out" v-on:click="sendMessage" :class="pageFlag?'':'chat_top'">发送</span>
         </div>
     </div>
     <!-- 名词解释 -->
@@ -504,6 +530,7 @@
                 pageFlag: false,      //历史记录分页
                 chatPageIndex: '',     //聊天分页 页数
                 chatTotal: 0,
+                sendMoreFlag: true,    //防止发送多次
                 redNewMessage: false,    //是否显示有新消息提示  红点
                 update: {},                   //动态显示未读条数
                 urlXDZS: expert.url,
@@ -548,7 +575,7 @@
                 flagImg: [false, false, false, false, false],  //紧急程度
                 urgentIndex: '',
                 inHand: false,  //处理中
-                isUrgent:'',   //处理中紧急程度
+                isUrgent: '',   //处理中紧急程度
                 inHandData: {},
                 handed: false,  //处理完
                 checkedNames: [],
@@ -661,6 +688,10 @@
                 /*if (this.consultationState != 5 || this.chatData == ''||this.consultationState != 6) {
                     return false;
                 }*/
+                if (!this.sendMoreFlag) {
+                    return false;
+                }
+                this.sendMoreFlag = false;
                 let url = expert.url + '/api/IM/SendMessage?accessKey=' + $.cookie(expert.cookie_key) + '&thingUnique=' + this.taskUnique + '&msgContent=' + this.chatData;
                 let params = {
                     accessKey: $.cookie(expert.cookie_key),
@@ -672,8 +703,10 @@
                         this.pageFlag = false;
                         this.chatData = '';
                         this.sendFlag = true;
-                        this.initSource(0,99);
+                        this.sendMoreFlag = true;
+                        this.initSource(0, 99);
                     } else {
+                        this.sendMoreFlag = true;
                         this.$message(res.Error);
                     }
                 })
@@ -809,7 +842,7 @@
                 this.newFlag = false;
                 this.completFlag = false;
                 this.allFlag = true;
-                this.dataList=[];
+                this.dataList = [];
                 this.type = expert.all;
                 this.clearData();
                 this.getConsultationLis();
@@ -818,7 +851,7 @@
                 this.completFlag = false;
                 this.allFlag = false;
                 this.newFlag = true;
-                this.dataList=[];
+                this.dataList = [];
                 this.type = expert.new;
                 this.clearData();
                 this.getConsultationLis();
@@ -827,7 +860,7 @@
                 this.allFlag = false;
                 this.newFlag = false;
                 this.completFlag = true;
-                this.dataList=[];
+                this.dataList = [];
                 this.type = expert.consultationed;
                 this.clearData();
                 this.getConsultationLis();
@@ -900,7 +933,7 @@
                 this.getConsultationLis();
             },
             change(val) {
-                this.pageIndex = val-1;
+                this.pageIndex = val - 1;
                 this.getConsultationLis();
             },
             radioChange(index) {
@@ -932,11 +965,11 @@
                 this.getNewCount();
             },
             //  点击表格tr
-            handleClick(state, taskUnique, count,isUrgent) {
+            handleClick(state, taskUnique, count, isUrgent) {
                 if (state == expert.newData) {
                     this.loading2 = true;
                 }
-                this.isUrgent=isUrgent;
+                this.isUrgent = isUrgent;
                 count > 0 ? this.redNewMessage = true : this.redNewMessage = false;
                 $(".error").empty();
                 let url = expert.url + '/api/Diagnosis/ExpAcceptAssist?accessKey=' + $.cookie(expert.cookie_key) + '&thingUnique=' + taskUnique;
@@ -1127,12 +1160,12 @@
                 });
             },
             changeEvent(event) {
-                let _id=event.target.id;
-                let Top=$('#diagnostic').scrollTop();
-                setTimeout(()=>{
+                let _id = event.target.id;
+                let Top = $('#diagnostic').scrollTop();
+                setTimeout(() => {
                     $('#diagnostic').scrollTop(Top);
                 });
-                if(!$("input[id=" + _id + "]").prop('checked')){
+                if (!$("input[id=" + _id + "]").prop('checked')) {
                     return false;
                 }
                 let value = event.target.value;
